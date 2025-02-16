@@ -4,7 +4,13 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+### 🚀 Maven ###
+.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+dependency-reduced-pom.xml
+
+### 🔥 STS (Spring Tool Suite) ###
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +19,13 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+### 💡 IntelliJ IDEA ###
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+### 🛠️ NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +35,47 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+### 💻 VS Code ###
 .vscode/
+.history/
+*.code-workspace
+*.swp
+/.classpath
+/.project
+/.settings
+/.factorypath
+
+### 🐳 Docker ###
+.dockerignore
+docker-compose.override.yml
+docker-volume/
+docker-network/
+
+### 🛢️ PostgreSQL (BD) ###
+*.pgdata/
+/pgdata/
+/data/
+
+### 📜 Logs y archivos de depuración ###
+logs/
+*.log
+*.out
+*.err
+hs_err_pid*
+
+### 🔐 Archivos de configuración local ###
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+### 📦 Archivos empaquetados ###
+*.jar
+*.war
+*.ear
+
+### 🗑️ Archivos del sistema (MacOS, Linux, Windows) ###
+.DS_Store
+Thumbs.db
