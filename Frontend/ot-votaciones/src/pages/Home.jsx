@@ -3,15 +3,22 @@ import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
 const participants = [
-  { id: 1, name: "Participante 1", image: "https://via.placeholder.com/150", description: "Descripción del Participante 1" },
-  { id: 2, name: "Participante 2", image: "https://via.placeholder.com/150", description: "Descripción del Participante 2" },
-  { id: 3, name: "Participante 3", image: "https://via.placeholder.com/150", description: "Descripción del Participante 3" },
-  { id: 4, name: "Participante 4", image: "https://via.placeholder.com/150", description: "Descripción del Participante 4" },
-  { id: 5, name: "Participante 5", image: "https://via.placeholder.com/150", description: "Descripción del Participante 5" },
-  { id: 6, name: "Participante 6", image: "https://via.placeholder.com/150", description: "Descripción del Participante 6" },
-  { id: 7, name: "Participante 7", image: "https://via.placeholder.com/150", description: "Descripción del Participante 7" },
-  { id: 8, name: "Participante 8", image: "https://via.placeholder.com/150", description: "Descripción del Participante 8" },
-  { id: 9, name: "Participante 9", image: "https://via.placeholder.com/150", description: "Descripción del Participante 9" }
+  { id: 1, name: "Naiara Moreno Aznar", image: "/imagenes/1.jpg", description: "Nació en Zaragoza el 29 de abril de 1997 y es la mayor de 6 hermanos. Fue cantante de la orquesta aragonesa Nueva Alaska hasta su paso por Operación Triunfo 2023." },
+  { id: 2, name: "Pablo (Paul Thin) Suárez Delgado", image: "/imagenes/2.jpg", description: "Armilla, Granada, 14 de diciembre de 2002" },
+  { id: 3, name: "Ruslana Panchyshyna Lapets", image: "/imagenes/3.jpg", description: "Tenerife, 10 de septiembre de 2005" },
+  { id: 4, name: "Juanjo Bona Arregui", image: "/imagenes/4.png", description: "Nació en Magallón, Zaragoza, el 10 de noviembre de 2003. Tiene un hermano 3 años menor que él. Recibió clases de canto, solfeo y jota desde muy pequeño, al mismo tiempo que aprendía a tocar el clarinete en la Escuela de Música de Magall" },
+  { id: 5, name: "Lucas Curotto", image: "/imagenes/5.jpg", description: "Desde muy temprana edad Curotto fue diagnosticado con TDAH y dislexia,1​ lo que dificultó su desempeño académico. Debido a estas dificultades, decidió dejar la escuela en su adolescencia para enfocarse en su pasión por la música." },
+  { id: 6, name: "Martin Urrutia Horas", image: "/imagenes/6.jpg", description: "Nació en Guecho el 30 de marzo de 20051​ y es el mayor de tres hermanos.2​ Martin mostró interés por las artes escénicas desde muy pequeño, lo que le llevó a estudiar danza en la Escuela de Ballet Roser Carrés. Tras cursar el bachillerato de artes escénicas en Bilbao, ingresó en Dantzerti, la Escuela Superior de Arte Dramático y Danza del País Vasco." },
+  { id: 7, name: "Bea Fernández Soto", image: "/imagenes/7.jpg", description: " Nació en 2004 en San Fernando de Henares y es la menor de dos hermanas.​Desde muy pequeña recibió clases de música y movimiento. Antes de entrar a Operación Triunfo 2023, estudiaba el grado de Magisterio en Educación Primaria en la Universidad Complutense de Madrid y daba clases de iniciación de música y piano a niños." },
+  { id: 8, name: "Chiara Oliver Williams", image: "/imagenes/8.jpg", description: "De ascendencia menorquina por parte de padre y británica por parte de madre, mostró interés por la música desde sus primeros años. Su primer contacto con un escenario fue a los seis años, cuando participó como candidata en un concurso de talento organizado por un hotel." },
+  { id: 9, name: "Álvaro Gutiérrez Mayo", image: "/imagenes/9.jpg", description: "Sevilla, 4 de marzo de 2002" },
+  { id: 10, name: "Cristian (Cris) Bartolomé Botau", image: "/imagenes/10.jpg", description: "(San Cristóbal de La Laguna, Tenerife, 20 de septiembre de 1999" },
+  { id: 11, name: "Violeta Hódar Feixas", image: "/imagenes/11.jpg", description: "Motril, Granada, 23 de enero de 2001" },
+  { id: 12, name: "Alex Márquez Angorilla", image: "/imagenes/12.jpg", description: "Córdoba, 24 de noviembre de 1998" },
+  { id: 13, name: "Salma Díaz Picón", image: "/imagenes/13.jpg", description: "Mijas, Málaga, 4 de octubre de 2002" },
+  { id: 14, name: "Almudena (Denna) Ruiz Vilchez", image: "/imagenes/14.jpg", description: "Ogíjares, Granada, 30 de marzo de 2001" },
+  { id: 15, name: "Omar Samba Castro", image: "/imagenes/15.jpg", description: "Yunquera de Henares, Guadalajara, 9 de mayo de 1997" },
+  { id: 16, name: "Suzete Correia Ramos", image: "/imagenes/16.jpg", description: "Santa Cruz de Tenerife, 21 de abril de 2001" }
 ];
 
 const slideIn = keyframes`
@@ -98,7 +105,7 @@ const Title = styled.h1`
 
 const ParticipantsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 `;
 
