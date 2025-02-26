@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../styles/home.css";
 import { Participant, ParticipantsGrid } from "../components/Participant";
-import { Sidebar } from "../components/Sidebar";
+import Sidebar from "../components/Sidebar";
 import { LoginPopup } from "../components/LoginPopup";
 
 export default function Home() {
@@ -30,7 +30,7 @@ export default function Home() {
       >
         ☰
       </button>
-      <Sidebar isOpen={isMenuOpen}/>
+      <Sidebar isOpen={isMenuOpen} />
       <div className="content">
         <h1>Votaciones de OT</h1>
         {showLoginPrompt && (
