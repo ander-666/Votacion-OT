@@ -39,7 +39,7 @@ Para llevar a cabo el desarrollo del proyecto es necesario decidir cuales seran 
 ## Decisión
 
  Opciónes elgidas:
-    - Backend: Java (Provisional) + Spring Boot, porque 
+    - Backend: Java + Spring Boot, porque es un lenjuaje conocido y utilizado por los miembros del equipo.
     - Frontend: React, porque algunos de los miembros del equipo de desarrollo ya tienen experiencia con el framework.
     - BD: Postgres SQL, porque al ser una aplicacion de votacion con gran volumen de datos un mayor rendimiento y el uso de transacciones son especialmente utiles.
     - IDE : Visual Studio Code, porque es un IDE que se puede utilizar para muchas tecnologías utlizando sus extensiones.
