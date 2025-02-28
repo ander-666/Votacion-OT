@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: votacion-db
+    restart: always
+    environment:
+      POSTGRES_DB: votacion
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    #    ports:
+    #      - "5432:5432"
+    networks:
+      - votacion-net
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./Backend/ot_backend/
+      dockerfile: Dockerfile
+    container_name: votacion-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/votacion
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+    ports:
+      - "8080:8080"
+    networks:
+      - votacion-net
+
+  #  frontend:
+  #    build:
+  #      context: ./frontend
+  #      dockerfile: Dockerfile
+  #    container_name: votacion-frontend
+  #    restart: always
+  #    depends_on:
+  #      - backend
+  #    ports:
+  #      - "80:80"
+  #    networks:
+  #      - votacion-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    ports:
+      - "8180:8180"
+    networks:
+      - votacion-net
+    environment:
+      - KEYCLOAK_ADMIN=user
+      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KC_DB_URL_PORT=5432    
+      - KC_DB_URL_DATABASE=keycloack_db
+      - KC_DB_URL_HOST=db
+      - KC_DB_SCHEMA_UPDATE=auto
+      - KC_DB_USERNAME=keycloak_user
+      - KC_DB_PASSWORD=keycloak_secure_password
+      - KC_HTTP_PORT=8180 # Cambia el puerto interno de Keycloak
+      - KEYCLOAK_IMPORT=/opt/keycloak/data/import/keycloack-realm.json
+    volumes:
+      - ./keycloak-realm:/opt/keycloak/data/import
+    command: ["start-dev", "--import-realm"]
+
+networks:
+  votacion-net:
+
+volumes:
+  db_data:
