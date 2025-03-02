@@ -1,6 +1,22 @@
 /* eslint-disable react/prop-types */
+//import { fetchData } from "../fetchData";
+import { LoginPopup } from "../components/LoginPopup";
+import { useSession } from "../hooks/useSession";
+import { useParticipant } from "../hooks/useParticipant";
 
-export function Participant({ selectedParticipant, handleVote, setSelectedParticipant }) {
+export function Participant() {
+  const {isLoggedIn} = useSession();
+  const {selectedParticipant, setSelectedParticipant} = useParticipant();
+
+  const handleVote = () => {
+    if (!isLoggedIn) {
+      setSelectedParticipant(null);
+    } else {
+      alert(`Has votado por ${selectedParticipant.name}`);
+      setSelectedParticipant(null);
+    }
+  };
+  
   return (
     <div className="popup">
       <h2>{selectedParticipant.name}</h2>
@@ -20,7 +36,9 @@ export function Participant({ selectedParticipant, handleVote, setSelectedPartic
   );
 }
 
-export function ParticipantCard({ setSelectedParticipant, participant }) {
+export function ParticipantCard({ participant }) {
+  const { setSelectedParticipant} = useParticipant();
+
   return (
     <div className="card" onClick={() => setSelectedParticipant(participant)}>
       <div className="imageContainer">
@@ -36,7 +54,7 @@ export function ParticipantCard({ setSelectedParticipant, participant }) {
   );
 }
 
-export function ParticipantsGrid({ setSelectedParticipant }) {
+export function ParticipantsGrid() {
   
   const participants = [
     {
@@ -143,16 +161,35 @@ export function ParticipantsGrid({ setSelectedParticipant }) {
       description: "Santa Cruz de Tenerife, 21 de abril de 2001",
     },
   ];
-
+  
   return (
     <div className="participantsGrid">
-      {participants.map((participant) => (
+      {participants?.map((participant) => (
         <ParticipantCard
           key={participant.id}
-          setSelectedParticipant={setSelectedParticipant}
           participant={participant}
         ></ParticipantCard>
       ))}
+    </div>
+  );
+}
+
+export function Participants() {
+  const {selectedParticipant} = useParticipant();
+  const {isLoggedIn} = useSession();
+  console.log(selectedParticipant)
+  console.log(isLoggedIn)
+  return (
+    <div className="content">
+      <h1>Votaciones de OT</h1>
+      {!isLoggedIn && (
+        <LoginPopup/>
+      )}
+      {selectedParticipant ? (
+        <Participant/>
+      ) : (
+        <ParticipantsGrid/>
+      )}
     </div>
   );
 }
