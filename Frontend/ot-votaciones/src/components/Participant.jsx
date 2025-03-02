@@ -54,6 +54,8 @@ export function ParticipantCard({ participant }) {
   );
 }
 
+//const apiData = fetchData()
+
 export function ParticipantsGrid() {
   
   const participants = [
@@ -161,6 +163,7 @@ export function ParticipantsGrid() {
       description: "Santa Cruz de Tenerife, 21 de abril de 2001",
     },
   ];
+  //const participantsApi = apiData.read();
   
   return (
     <div className="participantsGrid">
