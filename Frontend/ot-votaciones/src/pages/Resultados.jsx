@@ -29,19 +29,6 @@ const ResultContainer = styled.div`
   padding: 20px;
 `;
 
-// BOTÓN DEL MENÚ
-const MenuButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 32px;
-  cursor: pointer;
-  z-index: 1101;
-`;
-
 // CONTENEDOR CENTRAL PARA GRÁFICOS Y BOTÓN
 const CenterContainer = styled.div`
   display: flex;
@@ -60,7 +47,7 @@ const ChartWrapper = styled.div`
 `;
 
 export default function Resultados() {
-  const [voteCounts, setVoteCounts] = useState({});
+  const [voteCounts, setVoteCounts] = useState({}); //fetchData(configData.API_URL+"/votes").read();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const changeMenuVisibility = () => setIsMenuOpen(!isMenuOpen);
 
@@ -79,7 +66,7 @@ export default function Resultados() {
     <>
       <BackgroundParticles />
       <ResultContainer>
-        <MenuButton onClick={changeMenuVisibility}>☰</MenuButton>
+        <button className="menuButton" onClick={changeMenuVisibility}>☰</button>
         <Sidebar isOpen={isMenuOpen} />
 
         {/* TÍTULO ARRIBA EN EL CENTRO */}

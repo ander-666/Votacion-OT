@@ -29,7 +29,7 @@ const getSuspender = (promise) => {
   
   export function fetchData(url, method = "GET", options = {}) {
     const { headers, body } = options;
-    
+    console.log(url)
     const promise = fetch(url, {
       method,
       headers: headers || { "Content-Type": "application/json" },

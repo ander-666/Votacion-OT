@@ -5,6 +5,7 @@ import HeroSection from "../components/HeroSection";
 import CTAButton from "../components/CTAButton";
 import ParticipantCarousel from "../components/ParticipantCarousel";
 import styled from "styled-components";
+import { ParticipantProvider } from "../context/ParticipantProvider";
 
 const HomeContainer = styled.div`
   display: flex;
@@ -37,7 +38,9 @@ export default function Inicio() {
         <Sidebar isOpen={isMenuOpen} />
         <HeroSection />
         <CTAButton />
-        <ParticipantCarousel />
+        <ParticipantProvider>
+          <ParticipantCarousel/>
+        </ParticipantProvider>
       </HomeContainer>
     </>
   );

@@ -27,19 +27,6 @@ const AboutContainer = styled.div`
   padding: 20px;
 `;
 
-// BOTÓN DEL MENÚ
-const MenuButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 32px;
-  cursor: pointer;
-  z-index: 1101;
-`;
-
 // SECCIÓN DE INTRODUCCIÓN
 const IntroSection = styled(motion.div)`
   max-width: 800px;
@@ -60,7 +47,7 @@ export default function SobreNosotros() {
     <>
       <BackgroundParticles />
       <AboutContainer>
-        <MenuButton onClick={changeMenuVisibility}>☰</MenuButton>
+        <button className="mennuButton" onClick={changeMenuVisibility}>☰</button>
         <Sidebar isOpen={isMenuOpen} />
 
         <IntroSection variants={fadeIn} initial="hidden" animate="visible">
