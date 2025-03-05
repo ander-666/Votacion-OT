@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
-//import { fetchData } from "../fetchData";
 import { LoginPopup } from "../components/LoginPopup";
 import { useSession } from "../hooks/useSession";
 import { useParticipant } from "../hooks/useParticipant";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
 
 export function Participant() {
   const {isLoggedIn} = useSession();
@@ -12,7 +13,9 @@ export function Participant() {
     if (!isLoggedIn) {
       setSelectedParticipant(null);
     } else {
-      alert(`Has votado por ${selectedParticipant.name}`);
+      const voteRegistered = fetchData(configData.API_URL+"/vote").read();
+      if(voteRegistered)
+        alert(`Has votado por ${selectedParticipant.name}`);
       setSelectedParticipant(null);
     }
   };
@@ -54,11 +57,9 @@ export function ParticipantCard({ participant }) {
   );
 }
 
-//const apiData = fetchData()
-
 export function ParticipantsGrid() {
   
-  const participants = [
+  const participants2 = [
     {
       id: 1,
       name: "Naiara Moreno Aznar",
@@ -163,11 +164,11 @@ export function ParticipantsGrid() {
       description: "Santa Cruz de Tenerife, 21 de abril de 2001",
     },
   ];
-  //const participantsApi = apiData.read();
+  //const { participants } = useParticipant();
   
   return (
     <div className="participantsGrid">
-      {participants?.map((participant) => (
+      {participants2?.map((participant) => (
         <ParticipantCard
           key={participant.id}
           participant={participant}
@@ -180,8 +181,6 @@ export function ParticipantsGrid() {
 export function Participants() {
   const {selectedParticipant} = useParticipant();
   const {isLoggedIn} = useSession();
-  console.log(selectedParticipant)
-  console.log(isLoggedIn)
   return (
     <div className="content">
       <h1>Votaciones de OT</h1>

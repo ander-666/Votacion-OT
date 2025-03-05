@@ -2,6 +2,7 @@ import Slider from "react-slick";
 import styled from "styled-components";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useParticipant } from "../hooks/useParticipant";
 
 const CarouselContainer = styled.div`
   width: 80%;
@@ -53,6 +54,8 @@ export default function ParticipantCarousel() {
     autoplaySpeed: 2000,
     centerMode: true, // Centra las imágenes
   };
+
+  //const { participants } = useParticipant()
 
   return (
     <CarouselContainer>
