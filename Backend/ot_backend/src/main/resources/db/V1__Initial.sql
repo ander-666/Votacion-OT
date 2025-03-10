@@ -114,6 +114,8 @@ INSERT INTO common.concursantes (nombre, edad, descripcion, foto_url) VALUES
 ('Pedro Sánchez', 27, 'Rockero apasionado con gran presencia escénica.', 'https://example.com/pedro.jpg'),
 ('Ana Torres', 23, 'Especialista en baladas y música romántica.', 'https://example.com/ana.jpg');
 
+--INSERT INTO users.users (username, password, email, active, created_at, updated_at) VALUES ('Samu','samu','samu@samu.samu','yes','2022-03-10 10:20:03','2022-03-10 10:20:03');
+--INSERT INTO common.votos (user_id, concursante_id, fecha) VALUES (1, 5,'2022-03-10 10:20:03');
 
 -- Step 3: Connect to `keycloak_db` and configure Keycloak
 \c keycloak_db;

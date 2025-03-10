@@ -5,12 +5,17 @@ import com.ot.backend.ot_backend.repository.VoteRepository;
 import com.ot.backend.ot_backend.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ot.backend.ot_backend.domain.Participant;
 import com.ot.backend.ot_backend.domain.User;
 import com.ot.backend.ot_backend.domain.Vote;
+import com.ot.backend.ot_backend.dto.ResultadoVotacionDto;
 
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -45,4 +50,20 @@ public class VoteController {
         votoRepository.save(voto);
         return "Voto registrado";
     }   
+    
+    @GetMapping("/resultados")
+    public ResponseEntity<List<ResultadoVotacionDto>> obtenerResultadosVotacion() {
+        List<Object[]> resultados = votoRepository.countVotosPorConcursante();
+        List<ResultadoVotacionDto> resultadoVotacionDTOs = new ArrayList<>();
+        for (Object[] resultado : resultados) {
+            Long concursanteId = (Long) resultado[0];
+            Long votos = (Long) resultado[1]; 
+            Participant concursante = concursanteRepository.findById(concursanteId).orElse(null);
+            if (concursante != null) {
+                ResultadoVotacionDto dto = new ResultadoVotacionDto(concursante.getNombre(), votos);
+                resultadoVotacionDTOs.add(dto);
+            }
+        }
+        return ResponseEntity.ok(resultadoVotacionDTOs);
+    }
 }
