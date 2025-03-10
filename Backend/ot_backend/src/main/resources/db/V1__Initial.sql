@@ -1,9 +1,9 @@
 -- Step 1: Create separate databases
-CREATE DATABASE votacion-db;
+CREATE DATABASE votacion;
 CREATE DATABASE keycloak_db;
 
 -- Step 2: Connect to `votacion_db` and configure users and permissions
-\c votacion-db;
+\c votacion;
 
 -- Create roles for applications
 CREATE ROLE votacion_user WITH LOGIN PASSWORD 'votacion_secure_password';
@@ -14,7 +14,7 @@ CREATE SCHEMA IF NOT EXISTS users;
 CREATE SCHEMA IF NOT EXISTS common;
 
 -- Grant permissions for the voting application user
-GRANT CONNECT ON DATABASE votacion_db TO votacion_user;
+GRANT CONNECT ON DATABASE votacion TO votacion_user;
 GRANT USAGE ON SCHEMA common TO votacion_user;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA common TO votacion_user;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA common TO votacion_user;
@@ -24,7 +24,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA common GRANT SELECT, INSERT, UPDATE, DELETE O
 ALTER DEFAULT PRIVILEGES IN SCHEMA common GRANT USAGE, SELECT ON SEQUENCES TO votacion_user;
 
 -- Grant permissions for the users admin
-GRANT CONNECT ON DATABASE votacion_db TO users_admin;
+GRANT CONNECT ON DATABASE votacion TO users_admin;
 GRANT USAGE ON SCHEMA users TO users_admin;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA users TO users_admin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA users TO users_admin;
@@ -80,11 +80,11 @@ INSERT INTO users.permissions (name, description) VALUES
 ('VIEW_REPORTS', 'View reports');
 
 INSERT INTO users.users (username, password, email, active)
-VALUES ('admin_user', '5f4dcc3b5aa765d61d8327deb882cf99', 'admin@example.com', TRUE);
+VALUES ('admin_user', '5f4dcc3b5aa765d61d8327deb882cf99', 'admin@example.com', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO users.user_roles (user_id, role_id) VALUES
-(1, (SELECT id FROM users.roles WHERE name = 'Admin')),
-(1, (SELECT id FROM users.roles WHERE name = 'Manager'));
+(1, (SELECT id FROM users.roles WHERE name = 'Admin' LIMIT 1)),
+(1, (SELECT id FROM users.roles WHERE name = 'Manager' LIMIT 1));
 
 INSERT INTO users.role_permissions (role_id, permission_id)
 SELECT r.id, p.id FROM users.roles r JOIN users.permissions p ON r.name = 'Admin';
@@ -108,11 +108,12 @@ CREATE TABLE IF NOT EXISTS common.votos (
 );
 
 INSERT INTO common.concursantes (nombre, edad, descripcion, foto_url) VALUES
-    ('María López', 22, 'Cantante de pop con gran carisma en el escenario.', 'https://example.com/maria.jpg'),
-    ('Carlos Pérez', 25, 'Músico de jazz con una voz única.', 'https://example.com/carlos.jpg'),
-    ('Laura Gómez', 20, 'Talentosa bailarina y cantante de flamenco.', 'https://example.com/laura.jpg'),
-    ('Pedro Sánchez', 27, 'Rockero apasionado con gran presencia escénica.', 'https://example.com/pedro.jpg'),
-    ('Ana Torres', 23, 'Especialista en baladas y música romántica.', 'https://example.com/ana.jpg');
+('María López', 22, 'Cantante de pop con gran carisma en el escenario.', 'https://example.com/maria.jpg'),
+('Carlos Pérez', 25, 'Músico de jazz con una voz única.', 'https://example.com/carlos.jpg'),
+('Laura Gómez', 20, 'Talentosa bailarina y cantante de flamenco.', 'https://example.com/laura.jpg'),
+('Pedro Sánchez', 27, 'Rockero apasionado con gran presencia escénica.', 'https://example.com/pedro.jpg'),
+('Ana Torres', 23, 'Especialista en baladas y música romántica.', 'https://example.com/ana.jpg');
+
 
 -- Step 3: Connect to `keycloak_db` and configure Keycloak
 \c keycloak_db;
