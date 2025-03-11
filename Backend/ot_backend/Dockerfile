@@ -7,7 +7,7 @@ COPY src ./src
 
 
 RUN apt-get update && apt-get install -y maven \
-    && mvn clean package -DskipTests
+    && mvn -P prod clean package -DskipTests
 
 FROM openjdk:17-jdk-slim
 

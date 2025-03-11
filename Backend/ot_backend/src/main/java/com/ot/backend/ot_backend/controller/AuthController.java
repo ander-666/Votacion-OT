@@ -10,11 +10,9 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.ot.backend.ot_backend.domain.Role;
-import com.ot.backend.ot_backend.domain.User;
+import com.ot.backend.ot_backend.domain.Gala;
 import com.ot.backend.ot_backend.dto.RegisterDto;
-import com.ot.backend.ot_backend.repository.UserRepository;
-import com.ot.backend.ot_backend.repository.RoleRepository;
+import com.ot.backend.ot_backend.repository.GalaRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,9 +26,7 @@ import java.util.Collections;
 public class AuthController {
     
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
+    private GalaRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -44,7 +40,7 @@ public class AuthController {
         // return jwtAuthResponse;
     }
 
-    @PostMapping("/register")
+    /*@PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegisterDto request) {
         Optional<User> existingUser = userRepository.findByUsername(request.getUsername());
         if (existingUser.isPresent()) {
@@ -52,7 +48,7 @@ public class AuthController {
         }
 
         // Obtener el rol USER por defecto
-        Role userRole = roleRepository.findByName("USER")
+        Gala userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Rol USER no encontrado"));
 
         User user = new User();
@@ -67,6 +63,6 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Usuario registrado exitosamente");
-    }
+    }*/
 
 }

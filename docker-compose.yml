@@ -1,21 +1,23 @@
-version: "3.8"
-
 services:
-  db:
+  postgres:
     image: postgres:15
-    container_name: votacion-db
+    container_name: postgres
     restart: always
     environment:
-      POSTGRES_DB: votacion
-      POSTGRES_USER: user
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    #    ports:
-    #      - "5432:5432"
+    ports:
+      - "5432:5432"
     networks:
       - votacion-net
     volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./Backend/ot_backend/src/main/resources/db/V1__Initial.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Backend/ot_backend/src/main/resources/db/database_scripts:/docker-entrypoint-initdb.d
+    #  - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
 
   backend:
     build:
@@ -24,55 +26,133 @@ services:
     container_name: votacion-backend
     restart: always
     depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/votacion
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      postgres:
+        condition: service_healthy
+    #environment:
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/votacion_db
+      #SPRING_DATASOURCE_USERNAME: root
+      #SPRING_DATASOURCE_PASSWORD: root_password
+      #SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
     ports:
       - "8080:8080"
     networks:
       - votacion-net
 
-  #  frontend:
-  #    build:
-  #      context: ./frontend
-  #      dockerfile: Dockerfile
-  #    container_name: votacion-frontend
-  #    restart: always
-  #    depends_on:
-  #      - backend
-  #    ports:
-  #      - "80:80"
-  #    networks:
-  #      - votacion-net
+  frontend:
+    build:
+      context: ./Frontend/ot-votaciones/
+      dockerfile: Dockerfile
+    container_name: votacion-frontend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8002:80"
+    networks:
+      - votacion-net
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    environment:
+      KEYCLOAK_ADMIN: user
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_secure_password
+      KC_DB_SCHEMA: public
+      KC_DB_SCHEMA_UPDATE: auto
+      KC_HTTP_PORT: 8180
+      KC_HEALTH_ENABLED: "true"
+      KEYCLOAK_IMPORT: /opt/keycloak/data/import/keycloak-realm.json
     ports:
       - "8180:8180"
-    networks:
-      - votacion-net
-    environment:
-      - KEYCLOAK_ADMIN=user
-      - KEYCLOAK_ADMIN_PASSWORD=password
-      - KC_DB_URL_PORT=5432    
-      - KC_DB_URL_DATABASE=keycloack_db
-      - KC_DB_URL_HOST=db
-      - KC_DB_SCHEMA_UPDATE=auto
-      - KC_DB_USERNAME=keycloak_user
-      - KC_DB_PASSWORD=keycloak_secure_password
-      - KC_HTTP_PORT=8180 # Cambia el puerto interno de Keycloak
-      - KEYCLOAK_IMPORT=/opt/keycloak/data/import/keycloack-realm.json
+    #healthcheck:
+    #  test: ["CMD", "curl", "-f", "http://localhost:8180/health/ready"]
+    #  interval: 10s
+    # retries: 10
+    #  start_period: 60s
     volumes:
       - ./keycloak-realm:/opt/keycloak/data/import
-      
-    command: ["start-dev", "--import-realm"]
+      - ./keycloak-logs:/opt/keycloack/standalone/log
+    command: ["start-dev", "--verbose", "--import-realm"]
+    networks:
+      - votacion-net
+
+  kong-migrations:
+    image: kong/kong-gateway:3.5
+    container_name: kong-migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    command: kong migrations bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: postgres
+      KONG_PG_USER: kong_user
+      KONG_PG_PASSWORD: kong_secure_password
+      KONG_PG_DATABASE: kong_db
+    networks:
+      - votacion-net
+
+  kong:
+    image: kong/kong-gateway:3.5
+    container_name: kong
+    restart: always
+    depends_on:
+      kong-migrations:
+        condition: service_completed_successfully
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: postgres
+      KONG_PG_USER: kong_user
+      KONG_PG_PASSWORD: kong_secure_password
+      KONG_PG_DATABASE: kong_db
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+    ports:
+      - "8000:8000"  # Kong API Gateway
+      - "8001:8001"  # Kong Admin API
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - votacion-net
+
+  kong-setup:
+    image: curlimages/curl:latest
+    depends_on:
+      kong:
+        condition: service_healthy
+      #keycloak:
+      #  condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["sleep 60 && /scripts/setup-kong-db.sh"]
+    volumes:
+      - ./kong-config:/scripts
+    networks:
+      - votacion-net
 
 networks:
   votacion-net:
 
-volumes:
-  db_data:
+#volumes:
+#  db_data:

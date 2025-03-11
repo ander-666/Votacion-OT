@@ -16,13 +16,13 @@
       "alias": "otp-policy",
       "config": {
         "totp.type": "totp",
-        "totp.temporary": "false",
-        "totp.enabled": "true",
-        "totp.policy": "HOTP,TOTP",
+        "totp.temporary": false,
+        "totp.enabled": true,
+        "totp.policy": "TOTP",
         "totp.hashAlgorithm": "SHA1",
-        "totp.digits": "6",
-        "totp.lookAheadWindow": "1",
-        "totp.period": "30"
+        "totp.digits": 6,
+        "totp.lookAheadWindow": 1,
+        "totp.period": 30
       }
     }
   ],
@@ -51,6 +51,16 @@
           "authenticatorConfig": "otp-policy"
         }
       ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "openid",
+      "description": "OpenID Connect built-in client scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
     }
   ],
   "users": [
@@ -82,20 +92,50 @@
   },
   "clients": [
     {
-      "clientId": "my-app",
+      "id": "0453bd9a-3d23-49d5-9615-bdcba7513791",
+      "clientId": "32",
+      "name": "KONG",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "http://kong:8000/api",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": ["/*"],
+      "webOrigins": ["/*"],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
       "publicClient": true,
-      "redirectUris": ["http://localhost:3000/*"],
-      "webOrigins": ["+"]
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": ["openid"],
+      "optionalClientScopes": ["offline_access"]
     }
   ],
   "smtpServer": {
     "host": "smtp.gmail.com",
     "port": "587",
     "from": "no-reply@gmail.com",
-    "auth": "true",
+    "auth": true,
     "user": "v0t4c10not@gmail.com",
     "password": "ytmi datb mpte olny ",
-    "starttls": "true"
+    "starttls": true
   }
 }
