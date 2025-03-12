@@ -1,6 +1,25 @@
 /* eslint-disable react/prop-types */
+import { LoginPopup } from "../components/LoginPopup";
+import { useSession } from "../hooks/useSession";
+import { useParticipant } from "../hooks/useParticipant";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
 
-export function Participant({ selectedParticipant, handleVote, setSelectedParticipant }) {
+export function Participant() {
+  const {isLoggedIn} = useSession();
+  const {selectedParticipant, setSelectedParticipant} = useParticipant();
+
+  const handleVote = () => {
+    if (!isLoggedIn) {
+      setSelectedParticipant(null);
+    } else {
+      const voteRegistered = fetchData(configData.API_URL+"/vote").read();
+      if(voteRegistered)
+        alert(`Has votado por ${selectedParticipant.name}`);
+      setSelectedParticipant(null);
+    }
+  };
+  
   return (
     <div className="popup">
       <h2>{selectedParticipant.name}</h2>
@@ -20,7 +39,9 @@ export function Participant({ selectedParticipant, handleVote, setSelectedPartic
   );
 }
 
-export function ParticipantCard({ setSelectedParticipant, participant }) {
+export function ParticipantCard({ participant }) {
+  const { setSelectedParticipant} = useParticipant();
+
   return (
     <div className="card" onClick={() => setSelectedParticipant(participant)}>
       <div className="imageContainer">
@@ -36,9 +57,9 @@ export function ParticipantCard({ setSelectedParticipant, participant }) {
   );
 }
 
-export function ParticipantsGrid({ setSelectedParticipant }) {
+export function ParticipantsGrid() {
   
-  const participants = [
+  const participants2 = [
     {
       id: 1,
       name: "Naiara Moreno Aznar",
@@ -143,16 +164,34 @@ export function ParticipantsGrid({ setSelectedParticipant }) {
       description: "Santa Cruz de Tenerife, 21 de abril de 2001",
     },
   ];
-
+  //const { participants } = useParticipant();
+  
   return (
     <div className="participantsGrid">
-      {participants.map((participant) => (
+      {participants2?.map((participant) => (
         <ParticipantCard
           key={participant.id}
-          setSelectedParticipant={setSelectedParticipant}
           participant={participant}
         ></ParticipantCard>
       ))}
+    </div>
+  );
+}
+
+export function Participants() {
+  const {selectedParticipant} = useParticipant();
+  const {isLoggedIn} = useSession();
+  return (
+    <div className="content">
+      <h1>Votaciones de OT</h1>
+      {!isLoggedIn && (
+        <LoginPopup/>
+      )}
+      {selectedParticipant ? (
+        <Participant/>
+      ) : (
+        <ParticipantsGrid/>
+      )}
     </div>
   );
 }

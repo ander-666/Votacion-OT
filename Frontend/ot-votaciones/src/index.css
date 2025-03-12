@@ -54,6 +54,16 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Estilos para react-slick */
+.slick-prev, .slick-next {
+  z-index: 1;
+}
+
+.slick-prev:before, .slick-next:before {
+  color: white;
+}
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
