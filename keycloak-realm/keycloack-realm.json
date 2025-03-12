@@ -1,0 +1,141 @@
+{
+  "id": "myrealm",
+  "realm": "myrealm",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "verifyEmail": true,
+  "resetPasswordAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "rememberMe": true,
+  "editUsernameAllowed": false,
+  "sslRequired": "external",
+  "authenticatorConfig": [
+    {
+      "alias": "otp-policy",
+      "config": {
+        "totp.type": "totp",
+        "totp.temporary": false,
+        "totp.enabled": true,
+        "totp.policy": "TOTP",
+        "totp.hashAlgorithm": "SHA1",
+        "totp.digits": 6,
+        "totp.lookAheadWindow": 1,
+        "totp.period": 30
+      }
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "browser",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "requirement": "ALTERNATIVE"
+        },
+        {
+          "authenticator": "identity-provider-redirector",
+          "requirement": "ALTERNATIVE"
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "requirement": "REQUIRED"
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "requirement": "CONDITIONAL",
+          "authenticatorConfig": "otp-policy"
+        }
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "openid",
+      "description": "OpenID Connect built-in client scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123"
+        }
+      ],
+      "realmRoles": ["admin"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      },
+      {
+        "name": "user",
+        "description": "Regular user role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "id": "0453bd9a-3d23-49d5-9615-bdcba7513791",
+      "clientId": "32",
+      "name": "KONG",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "http://kong:8000/api",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": ["/*"],
+      "webOrigins": ["/*"],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": ["openid"],
+      "optionalClientScopes": ["offline_access"]
+    }
+  ],
+  "smtpServer": {
+    "host": "smtp.gmail.com",
+    "port": "587",
+    "from": "no-reply@gmail.com",
+    "auth": true,
+    "user": "v0t4c10not@gmail.com",
+    "password": "ytmi datb mpte olny ",
+    "starttls": true
+  }
+}

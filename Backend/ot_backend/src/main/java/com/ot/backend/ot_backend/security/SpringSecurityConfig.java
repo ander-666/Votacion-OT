@@ -7,10 +7,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
 
 @Configuration
 @EnableMethodSecurity
@@ -18,11 +17,11 @@ public class SpringSecurityConfig {
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
-        return new MessageDigestPasswordEncoder("MD5"); // Sabemos que esta deprecado pero necesitamos que se inseguro
+        return new BCryptPasswordEncoder(); // Use BCrypt for better security
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity, can be adjusted if necessary
                 .authorizeHttpRequests((authorize) -> {
                     // Public authentication endpoints
@@ -34,14 +33,21 @@ public class SpringSecurityConfig {
                     // Allow unauthenticated access to static resources (CSS, JS, images, etc.)
                     authorize.requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll();
                     // Allow unauthenticated access to custom folder (e.g., uploaded images)
-                    authorize.requestMatchers("/uploadedImages/**").permitAll();  // Modify this line to match your custom path
+                    authorize.requestMatchers("/uploadedImages/**").permitAll(); // Modify this line to match your
+                                                                                 // custom path
+                    // Allow unauthenticated access to Swagger endpoints
+                    authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**","/Participants/**","/votos/**",
+                            "/swagger-resources/**").permitAll();
                     // All other requests require authentication
                     authorize.anyRequest().authenticated();
                 })
-                .formLogin(form -> form
-                        .loginPage("/login") // Specify the custom login page URL
-                        .permitAll() // Allow unauthenticated access to the login page
-                );
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login") // Login page for OAuth2 (optional, can be configured)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout") // Handle logout via Spring Security
+                        .logoutSuccessUrl("/login?logout") // Redirect to login page after logout
+                        .permitAll());
 
         return http.build();
     }
@@ -50,5 +56,4 @@ public class SpringSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
 }
