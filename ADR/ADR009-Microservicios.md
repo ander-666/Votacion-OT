@@ -1,11 +1,11 @@
-# [Microservicios que componen el sistema]
+# Microservicios que componen el sistema
 -   Estado: aceptada
 -   Responsables: 
     - Sergio Villain
     - Samuel Gómez
     - Otilio Elcano
     - Ander Alonso
--   Fecha: 28/02/2025
+-   Fecha: 14/03/2025
 
 Historia técnica: N/A 
 
@@ -21,7 +21,7 @@ En una aplicacion de votacion basada en microservicios es necesario definir que 
 
 ## Opciones Consideradas
 
-**API, proveedor de identidades, frontend y base de datos**
+**API, proveedor de identidades, frontend, API Gateway, base de datos**
 
 ## Decisión
 
@@ -30,6 +30,7 @@ En una aplicacion de votacion basada en microservicios es necesario definir que 
     - Proveedor de identidades: Porque mejora la seguridad del sistema.
     - Frontend: Porque el proyecto necesita una interfaz accesible para los usuarios.
     - Base de datos: Porque sirve para almacenar y gestionar los datosde manera etructurada.
+    - API Gateway: Porque actúa como punto único de entrada para gestionar y enrutar solicitudes hacia múltiples servicios backend
 
 ### Consecuencias
 
@@ -75,3 +76,12 @@ Almacena, organiza y gestiona la información del sistema, proporcionando acceso
     - Centraliza y gestiona los datos de manera estructurada y confiable.
 -   **Desventaja:**
     - Puede convertirse en un punto único de fallo o en un cuello de botella si no se optimiza adecuadamente.
+
+### API Gateway
+Actúa como un punto único de entrada para gestionar, autenticar, enrutar y monitorear solicitudes hacia múltiples servicios backend, simplificando la comunicación entre clientes y servicios
+
+-   **Ventaja:**
+    - Facilita la seguridad, monitoreo y escalabilidad al centralizar la gestión de solicitudes y aplicar políticas de acceso.
+    - Permite desacoplar el frontend de los microservicios, facilitando la evolución independiente de cada uno.
+-   **Desventaja:**
+    - Si falla, puede comprometer todo el acceso al sistema, además de introducir latencia adicional

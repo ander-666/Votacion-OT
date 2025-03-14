@@ -1,18 +1,18 @@
-# [Metodologia y buenas prácticas]
+# Integración continua
 -   Estado: aceptada
 -   Responsables: 
     - Sergio Villain
     - Samuel Gómez
     - Otilio Elcano
     - Ander Alonso
--   Fecha: 28/02/2025
+-   Fecha: 14/03/2025
 
 
-Historia técnica: NA
+Historia técnica: N/A
 
 ## Contexto y Planteamiento del Problema
 
-Para que la realizacion de un sistema de votacion se desarrolle de la forma mas rapida y fluida posible es necesario establecer una metodologia de trabajo concreta acompañada del seguimiento de buenas paracticas.
+Para que la realizacion de un sistema de votacion se desarrolle de la forma mas rapida y fluida posible es necesario establecer una metodologia de trabajo concreta acompañada del seguimiento de buenas paracticas. La ejecucion de estas buenas practicas se lleva a cabo mediante metodos de integracion continua que garanticen el cumpleimendto del codigo integrado para con las buenas practicas establecidas.
 
 ## Factores en la Decisión
 
@@ -22,22 +22,18 @@ Para que la realizacion de un sistema de votacion se desarrolle de la forma mas 
 
 ## Opciones Consideradas
 
-- **Utilizacion de pull request**
-- **Utilizar estandares de codificación**
-- **Seguridad**
-- **Organización en sprints**
-- **Gestión de ramas en git**
-- **Analisis estático de código**
-- **Analisis dinámico de código**
+- **Análisis estático de código**
+- **Análisis dinámico de código**
 - **Coverage de tests unitarios**
 - **Automatización de tests unitarios con git actions**
-- **Utilización de un balanceador de carga**
+- **Análisis de dependencias**
 
 ## Decisión
 
- Opciónes elegidas: Utilización de pull request, seguridad, organización en sprints, gestión de ramas en git, análisis dinámico de código, coverage de test unitarios, automatización de test unitarios con git actions y utilización de un balanceador de carga. 
+ Opciónes elegidas: Análisis estático de código, coverage de test unitarios, automatización de test unitarios. Todo ello se levara a cabo mediante el uso de pipelines de github actions que automatizaran el proceso de ejecucion de las buenas practicas definidas para cada nueva pull request.
 
 Las opciones de las buenas practicas elegidas se han seleccionado con el proposito de agilizar el desarrollo del codigo al mismo tiempo que se aumenta la seguridad, se optimiza el desarrollo y la operación del sistema, mejorando aspectos como la colaboración, calidad del código, seguridad, rendimiento y escalabilidad. De esta forma, se pueden desarrollar sistemas más robustos, eficientes y fáciles de mantener. Para ello se han omitido tambien practicas y mecanismos que suponen un coste "excesivo" en comparacion con la escala del proyecto.
+
 ### Consecuencias
 
 -  **Positivas:**
@@ -50,36 +46,6 @@ Las opciones de las buenas practicas elegidas se han seleccionado con el proposi
     - La falta de verificacion humana puede derivar en la omision de errores
 
 ## Ventajas y Desventajas de las opciones
-
-### Utilización de pull request
-
--   **Ventajas:**
-    - Facilita la revisión de código antes de integrarlo al proyecto y detectar y corregir errores antes de la implementación final.
--   **Desventaja:**
-    - Requiere una cultura de revisión bien establecida para ser efectiva.
-
-### Seguridad
-
--   **Ventaja:**
-    - Protege la integridad del sistema y evita vulnerabilidades.
--   **Desventaja:**
-    - Implementar medidas de seguridad robustas puede aumentar el tiempo de desarrollo.
-
-
-### Organización en sprints
-
--   **Ventaja:**
-    - Divide el trabajo en ciclos cortos, permitiendo entregas iterativas y mejoras constantes.
--   **Desventaja:**
-    - Requiere una buena coordinación entre los miembros del equipo
-
-
-### Gestión de ramas en git
-
--   **Ventaja:**
-    - Facilita el trabajo en paralelo sin afectar la rama principal.
--   **Desventaja:**
-    - La mala gestión puede derivar en conflictos difíciles de resolver.
 
 ### Analisis estático de codigo
 
@@ -109,16 +75,9 @@ Las opciones de las buenas practicas elegidas se han seleccionado con el proposi
 -   **Desventaja:**
     - Puede ralentizar el pipeline si las pruebas no están optimizadas.
 
-### Utilizar estandares de codificación
-
--   **Ventajas:**
-    - Mejora la legibilidad y mantenibilidad del código.
--   **Desventajas:**
-    - Puede generar resistencia si el equipo no está acostumbrado a seguir normas estrictas.
-    
-### Utilización de un balanceador de carga
+### Análisis de dependencias
 
 -   **Ventaja:**
-    - Mejora la escalabilidad y la tolerancia a fallos al distribuir la carga de trabajo de manera eficiente.
+    - Ayuda a identificar y gestionar los componentes o módulos del proyecto.
 -   **Desventaja:**
-    - Mayor complejidad en la infraestructura y configuración inicial.
+    - Si las dependencias no se gestionan correctamente, pueden surgir problemas de mantenimiento y escalabilidad.
