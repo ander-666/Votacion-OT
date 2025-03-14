@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import BackgroundParticles from "../components/BackgroundParticles";
 import HeroSection from "../components/HeroSection";
@@ -25,6 +26,7 @@ const HomeContainer = styled.div`
 export default function Inicio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const changeMenuVisibility = () => setIsMenuOpen(!isMenuOpen)
+  const navigate = useNavigate();
   return (
     <>
       <BackgroundParticles />
