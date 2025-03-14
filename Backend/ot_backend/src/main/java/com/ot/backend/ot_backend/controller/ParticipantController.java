@@ -1,12 +1,10 @@
 package com.ot.backend.ot_backend.controller;
 
-
-import com.ot.backend.ot_backend.repository.ParticipantRepository;
+import com.ot.backend.ot_backend.service.ParticipantService;
+import com.ot.backend.ot_backend.domain.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.ot.backend.ot_backend.domain.Participant;
 
 import java.util.List;
 
@@ -15,26 +13,22 @@ import java.util.List;
 public class ParticipantController {
 
     @Autowired
-    private ParticipantRepository participantRepository;
+    private ParticipantService participantService;
 
     @GetMapping
     public List<Participant> obtenerParticipants() {
-        return participantRepository.findAll();
+        return participantService.obtenerParticipants();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Participant> obtenerParticipantPorId(@PathVariable Long id) {
-        Participant participant = participantRepository.findById(id).orElse(null);
-        
-        if (participant == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(participant);
+        return participantService.obtenerParticipantPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public Participant crearParticipant(@RequestBody Participant participant) {
-        return participantRepository.save(participant);
+        return participantService.crearParticipant(participant);
     }
 }

@@ -1,31 +1,31 @@
 package com.ot.backend.ot_backend.controller;
 
+import com.ot.backend.ot_backend.dto.ResultadoVotacionDto;
+import com.ot.backend.ot_backend.service.VoteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/votos")
 public class VoteController {
 
+    @Autowired
+    private VoteService voteService;
 
-    /*@PostMapping("/{userId}/{concursanteId}")
-    public String votar(@PathVariable Long userId, @PathVariable Long concursanteId) {
-        Optional<User> usuarioOpt = usuarioRepository.findById(userId);
-        Optional<Participant> concursanteOpt = concursanteRepository.findById(concursanteId);
+    @PostMapping("/{galaId}/{concursanteId}")
+    public String votar(@PathVariable Long galaId, 
+                        @PathVariable Long concursanteId, 
+                        @RequestHeader("ID_Token") String votantId) {
+        return voteService.votar(galaId, votantId, concursanteId);
+    }
 
-        if (usuarioOpt.isEmpty() || concursanteOpt.isEmpty()) {
-            return "Usuario o Concursante no encontrado";
-        }
-
-        if (votoRepository.existsByUsuarioIdAndConcursanteId(userId, concursanteId)) {
-            return "Ya has votado por este concursante";
-        }
-
-        Vote voto = new Vote();
-        voto.setUsuario(usuarioOpt.get());
-        voto.setConcursante(concursanteOpt.get());
-        votoRepository.save(voto);
-        return "Voto registrado";
-    }*/
+    @GetMapping("/resultados/{galaId}")
+    public ResponseEntity<List<ResultadoVotacionDto>> obtenerResultadosVotacion(@PathVariable Long galaId) {
+        List<ResultadoVotacionDto> resultados = voteService.obtenerResultadosVotacion(galaId);
+        return ResponseEntity.ok(resultados);
+    }
 }
+
