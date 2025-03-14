@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 const scaleIn = {
   hidden: { scale: 0.9 },
   visible: { scale: 1, transition: { duration: 0.6 } }
@@ -21,9 +21,8 @@ const Button = styled(motion.button)`
 `;
 
 export default function CTAButton() {
+  const navigate = useNavigate();
   return (
-    <Button variants={scaleIn} initial="hidden" animate="visible" onClick={() => window.location.href = "/home"}>
-      ¡Votar Ahora!
-    </Button>
+    <button onClick={() => navigate("/home")}>¡Votar Ahora!</button>
   );
 }
