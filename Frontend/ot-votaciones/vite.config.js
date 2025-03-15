@@ -6,7 +6,6 @@ export default defineConfig({
   css: {
     postcss: "./postcss.config.js",
   },
-  Base_de_la_API
   build: {
     outDir: 'build', // Specify the output directory
   },
