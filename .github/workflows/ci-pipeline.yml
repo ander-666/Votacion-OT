@@ -20,10 +20,10 @@ jobs:
         distribution: 'temurin'
     
     - name: Build with Maven
-      working-directory: Backend/ot-backend 
+      working-directory: Backend/ot_backend 
       run: mvn clean install
 
     - name: Run Tests
-      working-directory: Backend/ot-backend
+      working-directory: Backend/ot_backend
       run: mvn test
 
