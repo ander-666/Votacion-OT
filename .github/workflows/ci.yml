@@ -17,9 +17,9 @@ jobs:
         distribution: 'temurin'
     
     - name: Build with Maven
-      working-directory: ./Backend/ot-backend  # Ruta correcta a tu pom.xml
+      working-directory: Backend/ot-backend 
       run: mvn clean install
 
     - name: Run Tests
-      working-directory: ./Backend/ot-backend  # Ruta correcta a tu pom.xml
+      working-directory: Backend/ot-backend
       run: mvn test
