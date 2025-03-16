@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ParticipantCard from "./ParticipantCard";
 import ParticipantModal from "./ParticipantModal";
 import styled from "styled-components";
 import { LoginPopup } from "./LoginPopup";
+import { useParticipant} from "../hooks/useParticipant"
 
 const Wrapper = styled.div`
   display: flex;
@@ -34,27 +35,17 @@ const GridContainer = styled.div`
 `;
 
 export default function ParticipantsGrid() {
-  const [participants, setParticipants] = useState([]);
-  const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-
-  // ✅ Llamada a la API para obtener los participantes
-  useEffect(() => {
-    fetch("http://localhost:8080/Participants") // Ajusta si el backend usa otro puerto
-      .then((response) => response.json())
-      .then((data) => setParticipants(data))
-      .catch((error) => console.error("Error cargando los participantes:", error));
-  }, []);
+  const {participants, selectedParticipant, setSelectedParticipant} = useParticipant()
 
   return (
     <Wrapper>
       <Title>Participantes OT</Title>
-      <GridContainer>
-        {participants.map((participant) => (
-          <ParticipantCard key={participant.participantId} participant={participant} onClick={() => setSelectedParticipant(participant)} />
-        ))}
-      </GridContainer>
-
+        <GridContainer>
+          {participants.map((participant) => (
+            <ParticipantCard key={participant.participantId} participant={participant} onClick={() => setSelectedParticipant(participant)} />
+          ))}
+        </GridContainer>
       {selectedParticipant && (
         <ParticipantModal
           participant={selectedParticipant}

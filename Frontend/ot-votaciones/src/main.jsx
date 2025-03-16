@@ -8,9 +8,9 @@ import { SessionProvider } from "./context/sessionProvider";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-    <SessionProvider>
-      <App />
-    </SessionProvider>
+      <SessionProvider>
+        <App />
+      </SessionProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

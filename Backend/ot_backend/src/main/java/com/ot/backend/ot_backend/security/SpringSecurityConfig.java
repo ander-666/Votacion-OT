@@ -11,8 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class SpringSecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowCredentials(true);
-                    config.setAllowedOrigins(List.of("http://localhost:8002")); // ✅ Permitir el frontend
+                    config.setAllowedOrigins(List.of("http://localhost:8002", "http://localhost:5173")); // ✅ Permitir el frontend
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
                     return config;
@@ -51,6 +49,8 @@ public class SpringSecurityConfig {
                     // Allow unauthenticated access to Swagger endpoints
                     authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/Participants/**", "/votos/**",
                             "/swagger-resources/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/Participants/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/api/vote").authenticated();
                     // All other requests require authentication
                     authorize.anyRequest().authenticated();
                 })
@@ -69,4 +69,5 @@ public class SpringSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+    
 }

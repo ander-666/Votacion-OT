@@ -1,4 +1,9 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
+import { useSession } from "../hooks/useSession";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
+import { useState } from "react";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -52,24 +57,89 @@ const Button = styled.button`
   }
 `;
 
+const alreadyVotedData = fetchData(configData.API_URL+"/AlreadyVoted", "POST",
+  { headers:
+      {
+        "Content-Type": "application/json"
+      },
+    body:
+      {
+        "userId": 123,
+        "timestamp": new Date().toISOString() // definir gala en función de fecha en la que se vota
+      }
+});
+
 export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
+  const { isLoggedIn } = useSession()  
+  const alreadyVoted = false // votedData.read()
+  const [voteDone, setVoteDone] = useState(false)
+  const [voteError, setVoteError] = useState(false)
+
   const handleVote = () => {
-    onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
-    setTimeout(() => {
-      setShowLoginPopup(true);
-    }, 200);
+    if(isLoggedIn){
+      // setVoteDone(true)
+      // setVoteError(false)
+      try{
+        const voteData = fetchData(configData.API_URL+"/Vote", "POST",
+          { headers:
+              {
+                "Content-Type": "application/json"
+              },
+            body:
+              {
+                "participantId": participant.participantId
+              }
+        });
+        setVoteDone(voteData.read());
+        setVoteError(!voteDone);
+      }
+      catch{
+        setVoteError(true);
+        setVoteDone(false);
+      }
+    }
+    else{
+      onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
+      setTimeout(() => {
+        setShowLoginPopup(!isLoggedIn);
+      }, 200);
+    }  
+    
   };
 
   return (
     <ModalOverlay>
       <ModalContent>
-        <h2>{participant.name}</h2>
-        <ImageContainer>
-          <img src={participant.image} alt={participant.name} width="100%" height="100%" />
-        </ImageContainer>
-        <p>{participant.description}</p>
-        <Button onClick={handleVote}>Votar</Button> {/* ✅ Ahora cierra el modal y abre el LoginPopup */}
-        <Button onClick={onClose}>Cerrar</Button>
+        { alreadyVoted ?
+          <>
+            <p>Ya has votado anteriormente</p>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+          :
+          (voteError ? 
+          <>
+            <p>Error al votar</p>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+          :
+          (voteDone ? 
+            <>
+              <p>Voto registrado correctamente!</p>
+              <Button onClick={onClose}>Cerrar</Button>
+            </>
+            :
+            <>
+            <h2>{participant.name}</h2>
+            <ImageContainer>
+              <img src={participant.image} alt={participant.name} width="100%" height="100%" />
+            </ImageContainer>
+            <p>{participant.description}</p>
+            <Button onClick={handleVote}>Votar</Button>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+          )
+          )
+        }
       </ModalContent>
     </ModalOverlay>
   );
