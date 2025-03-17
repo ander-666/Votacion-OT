@@ -31,4 +31,5 @@ jobs:
       run: mvn install -DskipTests
 
     - name: Run tests
+      working-directory: Backend/ot_backend 
       run: mvn test
