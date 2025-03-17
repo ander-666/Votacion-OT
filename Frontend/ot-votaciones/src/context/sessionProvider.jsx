@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SessionContext } from "./sessionContext.js"
 
 export function SessionProvider ({ children }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     return (
         <SessionContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
            {children} 

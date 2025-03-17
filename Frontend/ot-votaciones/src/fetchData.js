@@ -29,11 +29,10 @@ const getSuspender = (promise) => {
   
   export function fetchData(url, method = "GET", options = {}) {
     const { headers, body } = options;
-    console.log(url)
     const promise = fetch(url, {
       method,
       headers: headers || { "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? JSON.stringify(body) : null,
     })
       .then((response) => {
         if (!response.ok) {
