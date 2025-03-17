@@ -18,6 +18,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
-
+          
+      - name: Build with Maven
+        working-directory: Backend/ot_backend 
+        run: mvn -P local clean install
+    
       - name: Build and run tests
         run: mvn clean test
