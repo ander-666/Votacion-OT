@@ -27,6 +27,7 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Install dependencies
+      working-directory: Backend/ot_backend 
       run: mvn install -DskipTests
 
     - name: Run tests
