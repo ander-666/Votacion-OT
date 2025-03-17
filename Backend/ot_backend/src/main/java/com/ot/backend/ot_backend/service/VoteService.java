@@ -23,7 +23,7 @@ public class VoteService {
     private ParticipantRepository participantRepository;
 
     public String votar(Long galaId, String votantId, Long concursanteId) {
-        // Comprobar si el concursante existe
+        /// Comprobar si el concursante existe
         Optional<Participant> participantOpt = participantRepository.findById(concursanteId);
 
         if (participantOpt.isEmpty()) {
