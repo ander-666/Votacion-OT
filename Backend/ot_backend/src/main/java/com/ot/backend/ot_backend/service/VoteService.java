@@ -8,6 +8,7 @@ import com.ot.backend.ot_backend.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +40,7 @@ public class VoteService {
         voto.setGalaId(galaId);
         voto.setVotantId(votantId);
         voto.setParticipant(participantOpt.get());
+        voto.setVoteDate(Instant.now());
 
         voteRepository.save(voto);
         return "Voto registrado con éxito";
