@@ -4,15 +4,15 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@IdClass(VoteId.class)  // Using composite primary key class
+@IdClass(VoteId.class) // Using composite primary key class
 @Table(name = "votes", schema = "users")
 public class Vote {
 
     @Id
     private Long galaId;
 
-    @Id
-    private String votantId;  // User identifier from the identity provider
+    @Column(length = 1000, name = "votant_id", nullable = false)
+    private String votantId; // User identifier from the identity provider
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false)
@@ -29,6 +29,7 @@ public class Vote {
     public void setGalaId(Long galaId) {
         this.galaId = galaId;
     }
+
 
     public String getVotantId() {
         return votantId;
