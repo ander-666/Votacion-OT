@@ -32,7 +32,8 @@ const getSuspender = (promise) => {
     console.log(url)
     const promise = fetch(url, {
       method,
-      headers: headers || { "Content-Type": "application/json" },
+      headers: headers || { "Content-Type": "application/json", "Access-Control-Allow-Origin":"*" },
+      mode: "cors",
       body: body ? JSON.stringify(body) : undefined,
     })
       .then((response) => {

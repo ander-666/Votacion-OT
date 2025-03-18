@@ -62,11 +62,13 @@ services:
       backend:
         condition: service_started
     environment:
-      KEYCLOAK_ADMIN: user
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_BOOTSTRAP_ADMIN_USERNAME: user
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
+      #KC_LOG_LEVEL: DEBUG  # Enable Debug Logging
+     # KC_LOG_LEVEL_ROOT: DEBUG
       KC_DB_URL_DATABASE: keycloak_db
       KC_DB_USERNAME: keycloak_user
       KC_DB_PASSWORD: keycloak_secure_password
@@ -74,14 +76,19 @@ services:
       KC_DB_SCHEMA_UPDATE: auto
       KC_HTTP_PORT: 8180
       KC_HEALTH_ENABLED: "true"
+      KC_PROXY: edge
+      KC_HOSTNAME: http://localhost:8000/auth
+      KC_HOSTNAME_ADMIN: http://localhost:8180/auth
+      KC_HTTP_RELATIVE_PATH: /auth
+      PROXY_ADDRESS_FORWARDING: "true"
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/keycloak-realm.json
     ports:
       - "8180:8180"
-    #healthcheck:
-    #  test: ["CMD", "curl", "-f", "http://localhost:8180/health/ready"]
-    #  interval: 10s
-    # retries: 10
-    #  start_period: 60s
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8180/realms/votacion_ot"]
+      interval: 10s
+      retries: 10
+      start_period: 60s
     volumes:
       - ./keycloak-realm:/opt/keycloak/data/import
       - ./keycloak-logs:/opt/keycloack/standalone/log
@@ -90,14 +97,14 @@ services:
       - votacion-net
 
   kong-migrations:
-    image: kong/kong-gateway:3.5
+    image: kong/kong:3.4.0
     container_name: kong-migrations
     depends_on:
       postgres:
         condition: service_healthy
       backend:
         condition: service_started
-    command: kong migrations bootstrap
+    command: ["sh", "-c", "sleep 10 && kong migrations bootstrap && kong migrations up"]
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: postgres
@@ -107,8 +114,12 @@ services:
     networks:
       - votacion-net
 
+    
+
   kong:
-    image: kong/kong-gateway:3.5
+    build:
+      context: ./kong-config/
+      dockerfile: Dockerfile
     container_name: kong
     restart: always
     depends_on:
@@ -118,6 +129,7 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_HOST: postgres
       KONG_PG_USER: kong_user
+      KONG_PLUGINS: bundled,oidc
       KONG_PG_PASSWORD: kong_secure_password
       KONG_PG_DATABASE: kong_db
       KONG_PROXY_ACCESS_LOG: /dev/stdout
@@ -138,7 +150,7 @@ services:
       - votacion-net
 
   kong-setup:
-    image: curlimages/curl:latest
+    image: alpine:latest
     depends_on:
       kong:
         condition: service_healthy

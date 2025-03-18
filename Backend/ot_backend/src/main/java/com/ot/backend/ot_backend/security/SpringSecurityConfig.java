@@ -1,5 +1,8 @@
 package com.ot.backend.ot_backend.security;
 
+import java.util.List;
+
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity
@@ -36,7 +41,8 @@ public class SpringSecurityConfig {
                     authorize.requestMatchers("/uploadedImages/**").permitAll(); // Modify this line to match your
                                                                                  // custom path
                     // Allow unauthenticated access to Swagger endpoints
-                    authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**","/Participants/**","/votos/**",
+                    authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                            "/Participants/**", "/votos/**",
                             "/swagger-resources/**").permitAll();
                     // All other requests require authentication
                     authorize.anyRequest().authenticated();
@@ -55,5 +61,20 @@ public class SpringSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    @Configuration
+    public class CorsConfig {
+        @Bean
+        public CorsFilter corsFilter() {
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins(List.of("/*")); // Allow React frontend
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setAllowCredentials(true);
+            source.registerCorsConfiguration("/**", config);
+            return new CorsFilter(source);
+        }
     }
 }
