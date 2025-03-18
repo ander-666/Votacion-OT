@@ -17,4 +17,6 @@ public interface VoteRepository extends JpaRepository<Vote, VoteId> {
     boolean existsByGalaIdAndVotantId(Long galaId, String votantId);
 
     boolean existsById(VoteId voteId);
+
+    List<Object[]> countVotosPorConcursante(Long galaId);
 }

@@ -1,6 +1,7 @@
 package com.ot.backend.ot_backend.controller;
 
 import com.ot.backend.ot_backend.repository.ParticipantRepository;
+import com.ot.backend.ot_backend.service.ParticipantService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -20,6 +21,8 @@ public class ParticipantController {
 
     @Autowired
     private ParticipantService participantService;
+    @Autowired
+    private ParticipantRepository participantRepository;
 
     @GetMapping
     public List<Participant> obtenerParticipants() {
