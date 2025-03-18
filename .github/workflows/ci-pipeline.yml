@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-      - test_funcionales
+      - tests_funcionales
   pull_request:
     branches:
       - main
