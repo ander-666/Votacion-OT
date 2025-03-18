@@ -29,7 +29,7 @@ jobs:
 
       - name: Install dependencies and run tests
         working-directory: Backend/ot_backend
-        run: mvn clean test
+        run: mvn -P local clean test
 
       - name: Upload test results
         if: always()
