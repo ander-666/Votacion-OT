@@ -6,6 +6,7 @@ import com.ot.backend.ot_backend.domain.Participant;
 import com.ot.backend.ot_backend.domain.Vote;
 import com.ot.backend.ot_backend.domain.VoteId;
 import com.ot.backend.ot_backend.dto.VoteDto;
+import com.ot.backend.ot_backend.dto.VoteResponseDto;
 import com.ot.backend.ot_backend.repository.ParticipantRepository;
 import com.ot.backend.ot_backend.repository.VoteRepository;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/votos")
@@ -26,7 +29,11 @@ public class VoteController {
         this.voteRepository = voteRepository;
         this.participantRepository = participantRepository;
     }
-
+    @GetMapping
+    public List<VoteResponseDto> votingList() {
+        return voteRepository.findAllVotes();
+    }
+    
     @PostMapping
     public ResponseEntity<String> votar(@Valid @RequestBody VoteDto voteDto, HttpServletRequest request) {
         // Extract Keycloak ID token from request (opaque token expected)
