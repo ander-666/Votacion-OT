@@ -31,7 +31,7 @@ const getSuspender = (promise) => {
     const { headers, body } = options;
     const promise = fetch(url, {
       method,
-      headers: headers || { "Content-Type": "application/json" },
+      headers: headers || { "Content-Type": "application/json"},
       body: body ? JSON.stringify(body) : null,
     })
       .then((response) => {

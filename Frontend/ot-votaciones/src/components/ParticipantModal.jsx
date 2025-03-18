@@ -59,9 +59,8 @@ const Button = styled.button`
 
 export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
   const { isLoggedIn } = useSession()  
-  const [alreadyVoted, setAlreadyVoted] = useState(false)
   const [voteDone, setVoteDone] = useState(false)
-  const [voteError, setVoteError] = useState(false)
+  const [voteText, setVoteText] = useState("")
 
   const handleVote = () => {
     if(isLoggedIn){
@@ -76,16 +75,17 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
             body:
               {
                 "galaId": configData.GALA_ID,
-                "concursanteId": participant.participantId
+                "participantId": participant.participantId
               }
         });
         let voteResult = voteData.read()
-        setVoteDone(voteResult.voted);
-        setVoteError(!voteDone);
+        setVoteText(voteResult)
       }
       catch{
-        setVoteError(true);
-        setVoteDone(false);
+        setVoteText("Error al votar");
+      }
+      finally{
+        setVoteDone(true);
       }
     }
     else{
@@ -100,21 +100,9 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
   return (
     <ModalOverlay>
       <ModalContent>
-        { alreadyVoted ?
-          <>
-            <p>Ya has votado anteriormente</p>
-            <Button onClick={onClose}>Cerrar</Button>
-          </>
-          :
-          (voteError ? 
-          <>
-            <p>Error al votar</p>
-            <Button onClick={onClose}>Cerrar</Button>
-          </>
-          :
-          (voteDone ? 
+          {voteDone ? 
             <>
-              <p>Voto registrado correctamente!</p>
+              <p>{voteText}</p>
               <Button onClick={onClose}>Cerrar</Button>
             </>
             :
@@ -127,9 +115,7 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
             <Button onClick={handleVote}>Votar</Button>
             <Button onClick={onClose}>Cerrar</Button>
           </>
-          )
-          )
-        }
+    }
       </ModalContent>
     </ModalOverlay>
   );

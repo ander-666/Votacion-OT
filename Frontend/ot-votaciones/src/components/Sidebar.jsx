@@ -7,11 +7,11 @@ const SidebarContainer = styled.div`
   height: 100vh;
   background: #2c3e50;
   padding: 20px;
-  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+  display: ${({ $isopen }) => ($isopen ? "flex" : "none")};
   flex-direction: column;
   gap: 20px;
   position: absolute;
-  left: ${({ isOpen }) => (isOpen ? "0" : "-250px")};
+  left: ${({ $isopen }) => ($isopen ? "0" : "-250px")};
   transition: left 0.3s ease-in-out;
   z-index: 1000;
   align-items: center;
@@ -32,10 +32,10 @@ const SidebarButton = styled.button`
   }
 `;
 
-function Sidebar({ isOpen }) {
+function Sidebar({ isopen }) {
   const navigate = useNavigate();
   return (
-    <SidebarContainer isOpen={isOpen}>
+    <SidebarContainer $isopen={isopen}>
       <SidebarButton onClick={() => navigate("/")}>🏠 Inicio</SidebarButton>
       <SidebarButton onClick={() => navigate("/home")}>🗳️ Votaciones</SidebarButton>
       <SidebarButton onClick={() => navigate("/resultados")}>📊 Resultados</SidebarButton>
