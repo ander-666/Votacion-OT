@@ -57,21 +57,9 @@ const Button = styled.button`
   }
 `;
 
-const alreadyVotedData = fetchData(configData.API_URL+"/AlreadyVoted", "POST",
-  { headers:
-      {
-        "Content-Type": "application/json"
-      },
-    body:
-      {
-        "userId": 123,
-        "timestamp": new Date().toISOString() // definir gala en función de fecha en la que se vota
-      }
-});
-
 export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
   const { isLoggedIn } = useSession()  
-  const alreadyVoted = false // votedData.read()
+  const [alreadyVoted, setAlreadyVoted] = useState(false)
   const [voteDone, setVoteDone] = useState(false)
   const [voteError, setVoteError] = useState(false)
 
@@ -80,17 +68,19 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
       // setVoteDone(true)
       // setVoteError(false)
       try{
-        const voteData = fetchData(configData.API_URL+"/Vote", "POST",
+        const voteData = fetchData(configData.API_URL+"/Votos", "POST",
           { headers:
               {
                 "Content-Type": "application/json"
               },
             body:
               {
-                "participantId": participant.participantId
+                "galaId": configData.GALA_ID,
+                "concursanteId": participant.participantId
               }
         });
-        setVoteDone(voteData.read());
+        let voteResult = voteData.read()
+        setVoteDone(voteResult.voted);
         setVoteError(!voteDone);
       }
       catch{
