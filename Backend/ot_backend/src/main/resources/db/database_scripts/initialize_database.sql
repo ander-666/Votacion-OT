@@ -58,6 +58,7 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO keycloak_user;
 -- Grant full privileges on existing sequences in public schema
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO keycloak_user;
 
+
 -- Ensure future tables and sequences are accessible to keycloak_user
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO keycloak_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO keycloak_user;

@@ -9,10 +9,11 @@ const participantsData = fetchData(configData.API_URL+"/Participants");
 export function ParticipantProvider ({ children }) {
     const participants = participantsData.read()
     const [selectedParticipant, setSelectedParticipant] = useState(null);
-
+    console.log(participants);
     return (
         <ParticipantContext.Provider value={{ participants, selectedParticipant, setSelectedParticipant }}>
            {children} 
         </ParticipantContext.Provider>
     )
+
 }
