@@ -6,7 +6,6 @@ on:
       - main
       - Servicios_API
 
-
 jobs:
   build:
     name: Build and analyze
@@ -37,4 +36,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ander-666_Votacion-OT_0a493e13-23e8-4847-9c9a-83138ab143fc -Dsonar.projectName='Votacion-OT'
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=ander-666_Votacion-OT_0a493e13-23e8-4847-9c9a-83138ab143fc \
+          -Dsonar.projectName='Votacion-OT' \
+          -Dsonar.branch.name=${{ github.ref_name }}
