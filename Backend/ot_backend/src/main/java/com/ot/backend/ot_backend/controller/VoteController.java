@@ -1,7 +1,6 @@
 package com.ot.backend.ot_backend.controller;
 
 import org.springframework.web.bind.annotation.*;
-
 import com.ot.backend.ot_backend.domain.Participant;
 import com.ot.backend.ot_backend.domain.Vote;
 import com.ot.backend.ot_backend.domain.VoteId;
@@ -10,13 +9,11 @@ import com.ot.backend.ot_backend.dto.VoteResponseDto;
 import com.ot.backend.ot_backend.repository.ParticipantRepository;
 import com.ot.backend.ot_backend.repository.VoteRepository;
 import org.springframework.http.ResponseEntity;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/votos")
@@ -29,21 +26,30 @@ public class VoteController {
         this.voteRepository = voteRepository;
         this.participantRepository = participantRepository;
     }
+    
     @GetMapping
     public List<VoteResponseDto> votingList() {
         return voteRepository.findAllVotes();
     }
     
     @PostMapping
-    public ResponseEntity<String> votar(@Valid @RequestBody VoteDto voteDto, HttpServletRequest request) {
-        // Extract Keycloak ID token from request (opaque token expected)
-        String idToken = request.getHeader("X-Id-Token");
-        if (idToken == null || idToken.isEmpty()) {
-            return ResponseEntity.status(401).body("ID Token is missing");
+    public ResponseEntity<String> votar(@Valid @RequestBody VoteDto voteDto, HttpServletRequest request,
+                                        @RequestParam(value = "apikey", required = false) String apiKey) {
+        // Extract API key from URL query parameter if present
+        if (apiKey == null || apiKey.isEmpty()) {
+            apiKey = request.getParameter("apikey");
         }
 
-        // Use the token directly as the votantId without decoding it.
-        String votantId = idToken; // opaque token used as identifier
+        // Extract ID token from header if API key is not provided
+        String idToken = (apiKey == null || apiKey.isEmpty()) ? request.getHeader("X-Id-Token") : null;
+
+        // Check that at least one of the credentials is provided
+        if ((apiKey == null || apiKey.isEmpty()) && (idToken == null || idToken.isEmpty())) {
+            return ResponseEntity.status(401).body("API Key or ID Token is missing");
+        }
+        
+        // Use API key if provided; otherwise, fall back to the ID token
+        String votantId = (apiKey != null && !apiKey.isEmpty()) ? apiKey : idToken;
 
         // Check if the participant exists
         Optional<Participant> participantOpt = participantRepository.findById(voteDto.getParticipantId());

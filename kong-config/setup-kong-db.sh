@@ -69,15 +69,6 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
 # Kong Route Configuration
 ##########################
 
-
-### Backend Service Routes ###
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
-    --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
-    --data "paths[]=/" \
-    --data "strip_path=false"
-
 ### Backend Free Service Routes ###
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=backend-service" \
@@ -87,21 +78,33 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "paths[]=/free/*" \
     --data "strip_path=true"
 
-# Create a Keycloak route
+#Create an API Key route for backend-service
+ APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
+   --data "service.name=backend-service" \
+   --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e01" \
+   --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
+   --data "paths[]=/api-key" \
+   --data "paths[]=/api-key/*" \
+   --data "strip_path=true")
 
+# Create a Keycloak route
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=keycloak" \
     --data "id=92e33755-3d1a-4469-81c2-ca7dc98c589d" \
     --data "service.id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
     --data "paths[]=/auth" \
+    --data "paths[]=/auth/*" \
     --data "strip_path=false"
 
- Create an API Key route for backend-service
- APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
-   --data "service.name=backend-service" \
-   --data "paths[]=/api-key" \
-   --data "paths[]=/api-key/*" \
-   --data "strip_path=true")
+### Backend Service Routes ###
+curl -s -X POST ${KONG_ADMIN_URL}/routes \
+    --data "service.name=backend-service" \
+    --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
+    --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
+    --data "paths[]=/" \
+    --data "strip_path=false"
+
+
 
  APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
  if [ -z "$APIKEY_ROUTE_ID" ]; then
@@ -150,7 +153,7 @@ echo "Configuring plugins..."
 # Enable the OIDC plugin on the OIDC route
 curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "id=3d1b5e45-8b4b-4052-9f2e-297806d5902a" \
-  --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
+  --data "route.id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
   --data "name=oidc" \
   --data "config.client_id=web-client" \
   --data "config.client_secret=cf657905-6daa-4e65-806f-86dd7c968b78" \
@@ -174,6 +177,7 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
   --data "config.key_in_body=false"
 
 # Enable the CORS plugin on the backend-service
+#http://localhost:8002,http://localhost:8000,http://votacion-frontend,http://localhost,http://localhost:8180
 curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
   --data "config.origins=*" \
@@ -188,7 +192,7 @@ curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "config.methods[]=CONNECT" \
   --data "config.headers=Accept,Authorization,Content-Type" \
   --data "config.exposed_headers=Content-Length" \
-  --data "config.credentials=false" \
+  --data "config.credentials=true" \
   --data "config.max_age=3600"
 
 
