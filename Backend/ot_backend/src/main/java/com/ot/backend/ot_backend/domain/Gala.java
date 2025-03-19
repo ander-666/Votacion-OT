@@ -12,7 +12,6 @@ public class Gala {
 
     private String description;
 
-    // Getters and Setters
     public Long getGalaId() {
         return galaId;
     }

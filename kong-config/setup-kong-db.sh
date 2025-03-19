@@ -196,6 +196,7 @@ curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "config.max_age=3600"
 
 
+
 ##########################
 # Keycloak Consumer and JWT Setup
 ##########################

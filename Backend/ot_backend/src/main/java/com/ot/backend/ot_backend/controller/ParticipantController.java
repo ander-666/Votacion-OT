@@ -37,7 +37,6 @@ public class ParticipantController {
         return ResponseEntity.ok(participant);
     }
 
-    // New endpoint to check that JWT tokens are sent in the request headers
     @GetMapping("/check-tokens")
     public ResponseEntity<Map<String, String>> checkTokens(HttpServletRequest request) {
         Map<String, String> tokens = new HashMap<>();

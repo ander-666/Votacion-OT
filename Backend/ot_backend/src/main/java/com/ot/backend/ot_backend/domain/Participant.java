@@ -14,9 +14,8 @@ public class Participant {
     private String surname;
     private String description;
     private Integer age;
-    private byte[] image;  // You can store image data here if needed
+    private byte[] image;
 
-    // Getters and Setters
     public Long getParticipantId() {
         return participantId;
     }
