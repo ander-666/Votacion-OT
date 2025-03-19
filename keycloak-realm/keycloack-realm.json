@@ -474,6 +474,27 @@
       ],
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "92debf1c-7a87-4643-93d0-bd9bfd54e429",
+      "username": "default_user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Default",
+      "lastName": "User",
+      "email": "defaultuser@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "MySecurePassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-votacion_ot"
+      ],
+      "requiredActions": [],
+      "groups": []
     }
   ],
   "scopeMappings": [

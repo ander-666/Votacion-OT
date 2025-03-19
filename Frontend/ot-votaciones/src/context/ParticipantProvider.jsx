@@ -4,7 +4,7 @@ import { ParticipantContext } from "./participantContext.js"
 import { fetchData } from "../fetchData";
 import configData from "../config.json";
 
-const participantsData = fetchData(configData.API_URL+"/Participants");
+const participantsData = fetchData(configData.API_URL+"/free");
 
 export function ParticipantProvider ({ children }) {
     const participants = participantsData.read()

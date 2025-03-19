@@ -6,33 +6,7 @@ KEYCLOAK_URL="http://keycloak:8180/realms/votacion_ot"
 ##########################
 # Install Dependencies
 ##########################
-KEYCLOAK_URL="http://keycloak:8180/realms/votacion_ot"
 
-##########################
-# Install Dependencies
-##########################
-
-# Install jq if missing
-if ! command -v jq &> /dev/null; then
-  echo "Installing jq..."
-  apk add --no-cache jq || (echo "Failed to install jq" && exit 1)
-fi
-
-# Install curl if missing
-if ! command -v curl &> /dev/null; then
-  echo "Installing curl..."
-  apk add --no-cache curl || (echo "Failed to install curl" && exit 1)
-fi
-
-# Install openssl if missing
-if ! command -v openssl &> /dev/null; then
-  echo "Installing openssl..."
-  apk add --no-cache openssl || (echo "Failed to install openssl" && exit 1)
-fi
-
-##########################
-# Wait for Kong Admin API
-##########################
 # Install jq if missing
 if ! command -v jq &> /dev/null; then
   echo "Installing jq..."
@@ -68,24 +42,19 @@ echo "Kong Admin API is available."
 ##########################
 
 echo "Configuring Kong for OIDC (via JWT validation) and API Key..."
-echo "Kong Admin API is available."
 
-##########################
-# Kong Service Configuration
-##########################
-
-echo "Configuring Kong for OIDC (via JWT validation) and API Key..."
-
-# Create a Kong service for the backend API
 # Create a Kong service for the backend API
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=94157cc3-0e51-4950-8fdb-384f95987c09" \
    --data "name=backend-service" \
    --data "url=http://backend:8080" \
    --data "protocol=http"
-   --data "id=94157cc3-0e51-4950-8fdb-384f95987c09" \
-   --data "name=backend-service" \
-   --data "url=http://backend:8080" \
+
+# Create a free Kong service for the backend API
+curl -i -X POST ${KONG_ADMIN_URL}/services \
+   --data "id=94157cc3-0e51-4950-8fdb-156f95987c09" \
+   --data "name=backend-free-service" \
+   --data "url=http://backend:8080/Participants" \
    --data "protocol=http"
 
 # Create a Kong service for Keycloak
@@ -94,6 +63,7 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "name=keycloak-service" \
    --data "url=http://keycloak:8180" \
    --data "protocol=http"
+
 
 ##########################
 # Kong Route Configuration
@@ -108,33 +78,14 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "paths[]=/" \
     --data "strip_path=false"
 
-# Create a Keycloak route
-
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=keycloak" \
-    --data "id=92e33755-3d1a-4469-81c2-ca7dc98c589d" \
-    --data "service.id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
-    --data "paths[]=/auth" \
-    --data "strip_path=false"
-# Create a Kong service for Keycloak
-curl -i -X POST ${KONG_ADMIN_URL}/services \
-   --data "id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
-   --data "name=keycloak-service" \
-   --data "url=http://keycloak:8180" \
-   --data "protocol=http"
-
-##########################
-# Kong Route Configuration
-##########################
-
-
-### Backend Service Routes ###
+### Backend Free Service Routes ###
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=backend-service" \
-    --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
-    --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
-    --data "paths[]=/" \
-    --data "strip_path=false"
+    --data "id=3c02b7c0-0e0b-258f-b9b3-332a1b458e02" \
+    --data "service.id=94157cc3-0e51-4950-8fdb-156f95987c09" \
+    --data "paths[]=/free" \
+    --data "paths[]=/free/*" \
+    --data "strip_path=true"
 
 # Create a Keycloak route
 
@@ -144,6 +95,21 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
     --data "paths[]=/auth" \
     --data "strip_path=false"
+
+ Create an API Key route for backend-service
+ APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
+   --data "service.name=backend-service" \
+   --data "paths[]=/api-key" \
+   --data "paths[]=/api-key/*" \
+   --data "strip_path=true")
+
+ APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
+ if [ -z "$APIKEY_ROUTE_ID" ]; then
+   echo "Failed to create API Key route for backend-service"
+   exit 1
+ fi
+
+echo "API Key Route for backend-service created with ID: $APIKEY_ROUTE_ID"
 
 # Create a JWT route for backend-service
 # JWT_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
@@ -159,48 +125,6 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
 # fi
 
 # echo "JWT Route for backend-service created with ID: $JWT_ROUTE_ID"
-
-# Create an API Key route for backend-service
-# APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
-#   --data "service.name=backend-service" \
-#   --data "paths[]=/api-key" \
-#   --data "paths[]=/api-key/*" \
-#   --data "strip_path=true")
-
-# APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
-# if [ -z "$APIKEY_ROUTE_ID" ]; then
-#   echo "Failed to create API Key route for backend-service"
-#   exit 1
-# fi
-# Create a JWT route for backend-service
-# JWT_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
-#   --data "service.name=backend-service" \
-#   --data "paths[]=/api" \
-#   --data "paths[]=/api/*" \
-#   --data "strip_path=true")
-
-# JWT_ROUTE_ID=$(echo "$JWT_ROUTE_RESPONSE" | jq -r '.id')
-# if [ -z "$JWT_ROUTE_ID" ]; then
-#   echo "Failed to create JWT route for backend-service"
-#   exit 1
-# fi
-
-# echo "JWT Route for backend-service created with ID: $JWT_ROUTE_ID"
-
-# Create an API Key route for backend-service
-# APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
-#   --data "service.name=backend-service" \
-#   --data "paths[]=/api-key" \
-#   --data "paths[]=/api-key/*" \
-#   --data "strip_path=true")
-
-# APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
-# if [ -z "$APIKEY_ROUTE_ID" ]; then
-#   echo "Failed to create API Key route for backend-service"
-#   exit 1
-# fi
-
-# echo "API Key Route for backend-service created with ID: $APIKEY_ROUTE_ID"
 
 # Create a route for OIDC authentication
 # OIDC_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
@@ -250,14 +174,23 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
   --data "config.key_in_body=false"
 
 # Enable the CORS plugin on the backend-service
-curl -X POST ${KONG_ADMIN_URL}/services/backend-service/plugins \
+curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
   --data "config.origins=*" \
-  --data "config.methods=GET,POST,PUT,DELETE" \
+  --data "config.methods[]=GET" \
+  --data "config.methods[]=HEAD" \
+  --data "config.methods[]=PUT" \
+  --data "config.methods[]=PATCH" \
+  --data "config.methods[]=POST" \
+  --data "config.methods[]=DELETE" \
+  --data "config.methods[]=OPTIONS" \
+  --data "config.methods[]=TRACE" \
+  --data "config.methods[]=CONNECT" \
   --data "config.headers=Accept,Authorization,Content-Type" \
   --data "config.exposed_headers=Content-Length" \
   --data "config.credentials=false" \
   --data "config.max_age=3600"
+
 
 ##########################
 # Keycloak Consumer and JWT Setup
@@ -331,10 +264,6 @@ echo "Setting up API Key consumer..."
  fi
 
 echo "API Key for api-key-user: $API_KEY"
-
-##########################
-# Final Message
-##########################
 
 ##########################
 # Final Message

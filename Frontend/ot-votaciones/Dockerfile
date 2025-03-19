@@ -11,6 +11,9 @@ COPY package*.json ./
 RUN npm install
 
 # Install vite separately
+RUN npm install keycloak-js
+
+# Install vite separately
 RUN npm install vite
 
 # Copy the rest of your app files
