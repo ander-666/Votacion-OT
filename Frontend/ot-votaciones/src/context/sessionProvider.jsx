@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { SessionContext } from "./sessionContext.js"
 
-export function SessionProvider ({ children }) {
+export function sessionProvider ({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     return (
         <SessionContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
