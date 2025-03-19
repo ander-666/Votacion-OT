@@ -823,9 +823,9 @@
       "clientId": "web-client",
       "name": "WebClient",
       "description": "OIDC client for web based applications",
-      "rootUrl": "",
+      "rootUrl": "http://localhost:8002",
       "adminUrl": "",
-      "baseUrl": "",
+      "baseUrl": "http://localhost:8002",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -833,10 +833,12 @@
       "secret": "cf657905-6daa-4e65-806f-86dd7c968b78",
       "redirectUris": [
         "http://localhost:8000/*",
-        "http://kong:8000/*"
+        "http://kong:8000/*",
+        "http://localhost:8002/*"
       ],
       "webOrigins": [
-        "/*"
+        "/*",
+        "http://localhost:8002"
       ],
       "notBefore": 0,
       "bearerOnly": false,

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import ParticipantCard from "./ParticipantCard";
-import ParticipantModal from "./ParticipantModal";
-import styled from "styled-components";
+import { useSession } from "../hooks/useSession";
 import { useParticipant } from "../hooks/useParticipant";
+import ParticipantCard from "../components/ParticipantCard";
+import ParticipantModal from "../components/ParticipantModal";
+import styled from "styled-components";
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,12 +34,19 @@ const GridContainer = styled.div`
   margin: 0 auto;
 `;
 
-export default function ParticipantsGrid({ onVote }) { // 🔹 Recibe `onVote` de Home.jsx
+export default function Votacion() {
+  const { isLoggedIn, login } = useSession();
   const { participants, selectedParticipant, setSelectedParticipant } = useParticipant();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  if (!isLoggedIn) {
+    login(); // Redirige automáticamente al login si el usuario no está autenticado
+    return null;
+  }
 
   return (
     <Wrapper>
-      <Title>Participantes OT</Title>
+      <Title>Votación - Operación Triunfo</Title>
       <GridContainer>
         {participants.map((participant) => (
           <ParticipantCard
@@ -53,7 +61,7 @@ export default function ParticipantsGrid({ onVote }) { // 🔹 Recibe `onVote` d
         <ParticipantModal
           participant={selectedParticipant}
           onClose={() => setSelectedParticipant(null)}
-          onVote={onVote} // 🔹 Pasa `onVote` al modal
+          setShowLoginPopup={setShowLoginPopup}
         />
       )}
     </Wrapper>

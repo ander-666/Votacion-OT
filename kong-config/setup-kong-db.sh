@@ -188,7 +188,7 @@ curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "config.methods[]=CONNECT" \
   --data "config.headers=Accept,Authorization,Content-Type" \
   --data "config.exposed_headers=Content-Length" \
-  --data "config.credentials=false" \
+  --data "config.credentials=true" \
   --data "config.max_age=3600"
 
 
