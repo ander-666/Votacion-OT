@@ -48,7 +48,7 @@ export default function SobreNosotros() {
       <BackgroundParticles />
       <AboutContainer>
         <button className="mennuButton" onClick={changeMenuVisibility}>☰</button>
-        <Sidebar isOpen={isMenuOpen} />
+        <Sidebar isopen={isMenuOpen} />
 
         <IntroSection variants={fadeIn} initial="hidden" animate="visible">
           <motion.h1>Sobre Nosotros</motion.h1>

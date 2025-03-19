@@ -41,7 +41,7 @@ export default function Home() {
       <button className="menuButton" onClick={changeMenuVisibility}>
         ☰
       </button>
-      <Sidebar isOpen={isMenuOpen} />
+      <Sidebar isopen={isMenuOpen} />
 
       <ParticipantProvider>
         <ParticipantsGrid participants={participantsMock} onVote={handleVote} />

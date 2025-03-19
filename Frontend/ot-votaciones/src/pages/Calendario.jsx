@@ -10,7 +10,7 @@ export default function Calendario() {
       <BackgroundParticles />
       <div className="pageContainer">
         <button className="menuButton" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-        <Sidebar isOpen={isMenuOpen} />
+        <Sidebar isopen={isMenuOpen} />
         <h1>Calendario de Galas</h1>
         <EventCalendar />
       </div>

@@ -1,4 +1,9 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
+import { useSession } from "../hooks/useSession";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
+import { useState } from "react";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -53,23 +58,64 @@ const Button = styled.button`
 `;
 
 export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
+  const { isLoggedIn } = useSession()  
+  const [voteDone, setVoteDone] = useState(false)
+  const [voteText, setVoteText] = useState("")
+
   const handleVote = () => {
-    onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
-    setTimeout(() => {
-      setShowLoginPopup(true);
-    }, 200);
+    if(isLoggedIn){
+      // setVoteDone(true)
+      // setVoteError(false)
+      try{
+        const voteData = fetchData(configData.API_URL+"/Votos", "POST",
+          { headers:
+              {
+                "Content-Type": "application/json"
+              },
+            body:
+              {
+                "galaId": configData.GALA_ID,
+                "participantId": participant.participantId
+              }
+        });
+        let voteResult = voteData.read()
+        setVoteText(voteResult)
+      }
+      catch{
+        setVoteText("Error al votar");
+      }
+      finally{
+        setVoteDone(true);
+      }
+    }
+    else{
+      onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
+      setTimeout(() => {
+        setShowLoginPopup(!isLoggedIn);
+      }, 200);
+    }  
+    
   };
 
   return (
     <ModalOverlay>
       <ModalContent>
-        <h2>{participant.name}</h2>
-        <ImageContainer>
-          <img src={participant.image} alt={participant.name} width="100%" height="100%" />
-        </ImageContainer>
-        <p>{participant.description}</p>
-        <Button onClick={handleVote}>Votar</Button> {/* ✅ Ahora cierra el modal y abre el LoginPopup */}
-        <Button onClick={onClose}>Cerrar</Button>
+          {voteDone ? 
+            <>
+              <p>{voteText}</p>
+              <Button onClick={onClose}>Cerrar</Button>
+            </>
+            :
+            <>
+            <h2>{participant.name}</h2>
+            <ImageContainer>
+              <img src={participant.image} alt={participant.name} width="100%" height="100%" />
+            </ImageContainer>
+            <p>{participant.description}</p>
+            <Button onClick={handleVote}>Votar</Button>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+    }
       </ModalContent>
     </ModalOverlay>
   );
