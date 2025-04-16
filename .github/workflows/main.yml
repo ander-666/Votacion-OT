@@ -1,4 +1,4 @@
-name: Push Docker Image to AWS ECR
+name: Push Docker Images to AWS ECR
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   push_to_ecr:
-    name: Build and Push Docker Image to ECR
+    name: Build and Push All Docker Images to ECR
     runs-on: ubuntu-latest
 
     steps:
@@ -20,20 +20,39 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, Tag, and Push Docker Image
+      - name: Build, Push and Create Repositories if Needed
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: latest
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Frontend/ot-votaciones
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # Lista de microservicios (carpetas donde están los Dockerfiles)
+          MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend")
 
-      - name: Verify Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY }}
+          for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
+            REPO_NAME=$(basename $SERVICE_PATH)
+            IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+
+            echo "Procesando $SERVICE_PATH -> $IMAGE_NAME"
+
+            # Verifica si el repositorio existe; si no, lo crea
+            if aws ecr describe-repositories --repository-names "$REPO_NAME" > /dev/null 2>&1; then
+              echo "Repositorio $REPO_NAME ya existe en ECR"
+            else
+              echo "Repositorio $REPO_NAME no existe. Creando..."
+              aws ecr create-repository --repository-name "$REPO_NAME" --region "$AWS_REGION"
+              echo "Repositorio $REPO_NAME creado"
+            fi
+
+            echo "Construyendo imagen Docker para $REPO_NAME"
+            docker build -t "$IMAGE_NAME" "$SERVICE_PATH"
+
+            echo "Pushing $IMAGE_NAME a ECR"
+            docker push "$IMAGE_NAME"
+          done
