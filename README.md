@@ -65,66 +65,14 @@ La vista de resultados permite mostrar, para cada gala, un gráfico de barras co
 
 ---
 
-## ⚖️ Escalabilidad
-
-### Antes:
-- Ya era escalable al estar basada en contenedores Docker
-- PostgreSQL permite múltiples conexiones simultáneas y garantiza transacciones
-
-### Ahora (mejoras):
-- Se ha añadido **Kong como API Gateway** que centraliza todas las llamadas a los microservicios y gestiona la seguridad, autenticación y el control de acceso
-- Se ha incorporado **Keycloak** como sistema de identidad centralizado, permitiendo login único en todo el sistema
-- Toda la arquitectura está preparada para escalar horizontalmente
-
----
-
 ## 🧪 Cómo ejecutar el proyecto
 
-### Requisitos:
+Más información en:
 
-- Docker y Docker Compose instalados
+https://github.com/ander-666/Votacion-OT/wiki/Configuraci%C3%B3n-y-Despliegue
 
-### Pasos:
-
-## Clona el repositorio:
-
-git clone https://github.com/ander-666/Votacion-OT.git
-cd tu-repo
-
-## Ejecuta los servicios:
-
-docker-compose up --build
-
-## Accede a la aplicación:
-
-Frontend (React): http://localhost:8002
-
-Keycloak Admin: http://localhost:8180
-
-Usuario: user
-
-Contraseña: password (o la definida en docker-compose)
-
-Backend API: http://localhost:8001
-
-Kong Gateway: http://localhost:8000
-
-## Base de Datos
-Se usa PostgreSQL con el esquema users
-
-Tabla principal: votes
-
-Columnas:
-
-gala_id: bigint
-
-votant_id: text
-
-participant_id: bigint
-
-vote_date: timestamp
 
 ## 📚 Wiki del proyecto
 Aquí puedes encontrar documentación adicional, ejemplos y detalles del despliegue y configuración:
 
-https://github.com/ander-666/Votacion-OT/wik
+https://github.com/ander-666/Votacion-OT/wiki
