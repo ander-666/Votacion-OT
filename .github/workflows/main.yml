@@ -1,4 +1,4 @@
-name: Push Docker Images to AWS ECR
+name: Push Docker Image to AWS ECR
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   push_to_ecr:
-    name: Build and Push Docker Images to ECR
+    name: Build and Push Docker Image to ECR
     runs-on: ubuntu-latest
 
     steps:
@@ -20,48 +20,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
 
-      # --- Construir y subir imagen para el Frontend ---
-      - name: Build, Tag and Push Frontend Docker Image
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker Image
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_FRONT }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_BACK }}
           IMAGE_TAG: latest
-          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          echo "🔐 Login manual ECR para Frontend"
-          aws ecr get-login-password --region $AWS_REGION \
-          | docker login --username AWS --password-stdin $ECR_REGISTRY
-      
-          echo "🐳 Construyendo imagen para el Frontend..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Frontend/ot-votaciones
-      
-          echo "📤 Subiendo imagen para el Frontend..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-
-      - name: Verify Frontend Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY_FRONT }}
-
-      # --- Construir y subir imagen para el Backend ---
-      - name: Build, Tag and Push Frontend Docker Image
-        env:
-          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_FRONT }}
-          IMAGE_TAG: latest
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          echo "🔐 Login manual ECR para Frontend"
-          aws ecr get-login-password --region $AWS_REGION \
-          | docker login --username AWS --password-stdin $ECR_REGISTRY
-      
-          echo "🐳 Construyendo imagen para el Frontend..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Frontend/ot-votaciones
-      
-          echo "📤 Subiendo imagen para el Frontend..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-
-      - name: Verify Backend Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY_BACK }}
+      - name: Verify Image in ECR
+        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY }}
