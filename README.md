@@ -17,7 +17,6 @@ Este proyecto es una aplicación web full-stack que permite a los usuarios votar
 
 ## 📦 Estructura del Proyecto
 
-|--------------------------------------------------------------------------------------------------------|
 | Carpeta / Archivo        | Descripción                                                                 |
 |--------------------------|-----------------------------------------------------------------------------|
 | `backend/`               | Aplicación Spring Boot con controladores, entidades y repositorios          |
@@ -26,7 +25,7 @@ Este proyecto es una aplicación web full-stack que permite a los usuarios votar
 | `keycloak/`              | Realm importable con configuración predefinida para Keycloak                |
 | `kong/`                  | Configuración declarativa para el API Gateway Kong                          |
 | `docker-compose.yml`     | Orquestador de todos los servicios del sistema                              |
-|--------------------------------------------------------------------------------------------------------|
+
 
 ## 🔐 Autenticación (Keycloak)
 
