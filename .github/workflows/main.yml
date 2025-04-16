@@ -22,15 +22,18 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Log in to Amazon ECR (manual using get-login)
+      - name: Log in to Amazon ECR (STS-compatible with password-stdin)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          echo "🔐 Realizando login manual a ECR con STS..."
-          $(aws ecr get-login --no-include-email --region $AWS_REGION)
+          echo "🔐 Login con get-login-password (STS compatible)"
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS \
+            --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
 
       - name: Build, Push and Create Repositories if Needed
         env:
