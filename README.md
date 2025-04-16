@@ -31,13 +31,6 @@ Este proyecto es una aplicación web full-stack que permite a los usuarios votar
 
 La aplicación usa Keycloak como proveedor de identidad. Cada usuario debe iniciar sesión antes de poder votar. La autenticación se realiza mediante OIDC, y una vez autenticado, el usuario puede acceder a todas las funcionalidades protegidas del sistema.
 
-### Ventajas:
-
-- Login centralizado
-- Roles gestionados desde Keycloak
-- Sesiones persistentes
-- Compatible con múltiples clientes
-
 ---
 
 ## 🗳️ Funcionalidad de Votación
