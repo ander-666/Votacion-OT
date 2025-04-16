@@ -109,7 +109,7 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
             <>
             <h2>{participant.name}</h2>
             <ImageContainer>
-              <img src={participant.image} alt={participant.name} width="100%" height="100%" />
+              <img src={`data:image/jpeg;base64,${participant.image}`} alt={participant.name} width="100%" height="100%" />
             </ImageContainer>
             <p>{participant.description}</p>
             <Button onClick={handleVote}>Votar</Button>
