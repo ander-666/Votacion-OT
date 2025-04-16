@@ -13,16 +13,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Log in to Amazon ECR (manual using get-login-password)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          echo "🔐 Logging in to Amazon ECR using get-login-password..."
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR (manual using get-login)
         env:
@@ -31,9 +29,8 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          echo "🔐 Realizando login manual a ECR con STS..."
-          aws ecr get-login --no-include-email --region $AWS_REGION | sed 's|https://||' | bash
-
+          echo "🔐 Login manual con get-login"
+          $(aws ecr get-login --no-include-email --region $AWS_REGION)
 
       - name: Build, Push and Create Repositories if Needed
         env:
@@ -42,13 +39,10 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend")
-
           for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
             REPO_NAME=$(basename "$SERVICE_PATH")
             IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
-
             echo "➡️ Procesando $SERVICE_PATH -> $IMAGE_NAME"
-
             if aws ecr describe-repositories --repository-names "$REPO_NAME" > /dev/null 2>&1; then
               echo "✅ Repositorio $REPO_NAME ya existe"
             else
@@ -56,10 +50,8 @@ jobs:
               aws ecr create-repository --repository-name "$REPO_NAME" --region "$AWS_REGION"
               echo "✅ Repositorio $REPO_NAME creado"
             fi
-
             echo "🐳 Construyendo imagen Docker para $REPO_NAME"
             docker build -t "$IMAGE_NAME" "$SERVICE_PATH"
-
             echo "📤 Pushing $IMAGE_NAME a ECR"
             docker push "$IMAGE_NAME"
           done
