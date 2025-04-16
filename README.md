@@ -17,14 +17,16 @@ Este proyecto es una aplicación web full-stack que permite a los usuarios votar
 
 ## 📦 Estructura del Proyecto
 
-├── backend/ # Aplicación Spring Boot con controladores, entidades, repositorios 
-├── frontend/ # Aplicación React con sistema de votación, autenticación y resultados 
-├── db/ # Configuración y migraciones de base de datos PostgreSQL 
-├── keycloak/ # Realm importable con configuración predefinida de Keycloak 
-├── kong/ # Configuración declarativa del API Gateway Kong ├── docker-compose.yml # Orquestador de todos los servicios del sistema
-
-
----
+|--------------------------------------------------------------------------------------------------------|
+| Carpeta / Archivo        | Descripción                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| `backend/`               | Aplicación Spring Boot con controladores, entidades y repositorios          |
+| `frontend/`              | Aplicación React con sistema de votación, autenticación y resultados        |
+| `db/`                    | Configuración y migraciones de la base de datos PostgreSQL                  |
+| `keycloak/`              | Realm importable con configuración predefinida para Keycloak                |
+| `kong/`                  | Configuración declarativa para el API Gateway Kong                          |
+| `docker-compose.yml`     | Orquestador de todos los servicios del sistema                              |
+|--------------------------------------------------------------------------------------------------------|
 
 ## 🔐 Autenticación (Keycloak)
 
