@@ -83,8 +83,8 @@ La vista de resultados permite mostrar, para cada gala, un gráfico de barras co
 
 ## Clona el repositorio:
 
-git clone https://github.com/tuusuario/tu-repo.git
-cd tu-repo´´´
+git clone https://github.com/ander-666/Votacion-OT.git
+cd tu-repo
 
 ## Ejecuta los servicios:
 
@@ -121,3 +121,5 @@ vote_date: timestamp
 
 ## 📚 Wiki del proyecto
 Aquí puedes encontrar documentación adicional, ejemplos y detalles del despliegue y configuración:
+
+https://github.com/ander-666/Votacion-OT/wik
