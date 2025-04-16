@@ -1,4 +1,4 @@
-name: Push Docker Image to AWS ECR
+name: Push Docker Images to AWS ECR
 
 on:
   push:
@@ -7,33 +7,51 @@ on:
 
 jobs:
   push_to_ecr:
-    name: Build and Push Docker Image to ECR
+    name: Build and Push All Docker Images to ECR
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up AWS CLI
+      - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Log in to Amazon ECR (manual using get-login)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          echo "🔐 Realizando login manual a ECR con STS..."
+          $(aws ecr get-login --no-include-email --region $AWS_REGION)
 
-      - name: Build, Tag, and Push Docker Image
+      - name: Build, Push and Create Repositories if Needed
         env:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_BACK }}
           IMAGE_TAG: latest
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Frontend/ot-votaciones
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Verify Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY }}
+          MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend")
+          for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
+            REPO_NAME=$(basename "$SERVICE_PATH")
+            IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+            echo "➡️ Procesando $SERVICE_PATH -> $IMAGE_NAME"
+            if aws ecr describe-repositories --repository-names "$REPO_NAME" > /dev/null 2>&1; then
+              echo "✅ Repositorio $REPO_NAME ya existe"
+            else
+              echo "🆕 Repositorio $REPO_NAME no existe. Creando..."
+              aws ecr create-repository --repository-name "$REPO_NAME" --region "$AWS_REGION"
+              echo "✅ Repositorio $REPO_NAME creado"
+            fi
+            echo "🐳 Construyendo imagen Docker para $REPO_NAME"
+            docker build -t "$IMAGE_NAME" "$SERVICE_PATH"
+            echo "📤 Pushing $IMAGE_NAME a ECR"
+            docker push "$IMAGE_NAME"
+          done
