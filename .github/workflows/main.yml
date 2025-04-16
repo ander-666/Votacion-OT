@@ -10,51 +10,61 @@ jobs:
     name: Build and Push Docker Images to ECR
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      IMAGE_TAG: latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up AWS CLI
+      - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
-      - name: Log in to Amazon ECR
+      - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # --- Construir y subir imagen para el Frontend ---
-      - name: Build, Tag and Push Frontend Docker Image
+      - name: Build and Push Frontend Docker Image
         env:
-          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          # Usar un repositorio distinto para cada servicio; 
-          # aquí se asume que el repositorio ya existe o se crea automáticamente
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_FRONT }}
-          IMAGE_TAG: latest
+          REPO_NAME: ${{ secrets.ECR_REPOSITORY_FRONT }}
         run: |
-          echo "Construyendo imagen para el Frontend..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Frontend/ot-votaciones
-          echo "Subiendo imagen para el Frontend..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ECR_URI=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$REPO_NAME
 
-      - name: Verify Frontend Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY_FRONT }}
+          echo "Verificando existencia del repositorio Frontend ($REPO_NAME)..."
+          aws ecr describe-repositories --repository-names "$REPO_NAME" >/dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$REPO_NAME"
 
-      # --- Construir y subir imagen para el Backend ---
-      - name: Build, Tag and Push Backend Docker Image
+          echo "Construyendo imagen Docker para Frontend..."
+          docker build -t "$ECR_URI:${{ env.IMAGE_TAG }}" Frontend/ot-votaciones
+
+          echo "Haciendo push de la imagen Frontend..."
+          docker push "$ECR_URI:${{ env.IMAGE_TAG }}"
+
+          echo "Imágenes en ECR para Frontend:"
+          aws ecr list-images --repository-name "$REPO_NAME"
+
+      - name: Build and Push Backend Docker Image
         env:
-          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          # Repositorio específico para el backend
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_BACK }}
-          IMAGE_TAG: latest
+          REPO_NAME: ${{ secrets.ECR_REPOSITORY_BACK }}
         run: |
-          echo "Construyendo imagen para el Backend..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG Backend/ot_backend
-          echo "Subiendo imagen para el Backend..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ECR_URI=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$REPO_NAME
 
-      - name: Verify Backend Image in ECR
-        run: aws ecr list-images --repository-name ${{ secrets.ECR_REPOSITORY_BACK }}
+          echo "Verificando existencia del repositorio Backend ($REPO_NAME)..."
+          aws ecr describe-repositories --repository-names "$REPO_NAME" >/dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$REPO_NAME"
+
+          echo "Construyendo imagen Docker para Backend..."
+          docker build -t "$ECR_URI:${{ env.IMAGE_TAG }}" Backend/ot_backend
+
+          echo "Haciendo push de la imagen Backend..."
+          docker push "$ECR_URI:${{ env.IMAGE_TAG }}"
+
+          echo "Imágenes en ECR para Backend:"
+          aws ecr list-images --repository-name "$REPO_NAME"
