@@ -6,3 +6,9 @@ export function useParticipant () {
     
     return {participants, selectedParticipant, setSelectedParticipant}
 }
+
+export function useSelectedParticipant () {
+    const { selectedParticipant, setSelectedParticipant } = useContext(ParticipantContext)
+    
+    return { selectedParticipant, setSelectedParticipant }
+}

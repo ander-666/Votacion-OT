@@ -10,7 +10,7 @@ export default function Playlist() {
       <BackgroundParticles />
       <div className="pageContainer">
         <button className="menuButton" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-        <Sidebar isOpen={isMenuOpen} />
+        <Sidebar isopen={isMenuOpen} />
         <h1>Playlist de OT</h1>
         <OTPlaylist />
       </div>

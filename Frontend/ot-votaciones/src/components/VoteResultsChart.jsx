@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import styled from "styled-components";
 

@@ -10,7 +10,7 @@ export default function Foro() {
       <BackgroundParticles />
       <div className="pageContainer">
         <button className="menuButton" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-        <Sidebar isOpen={isMenuOpen} />
+        <Sidebar isopen={isMenuOpen} />
         <h1>Foro de Fans</h1>
         <Forum />
       </div>

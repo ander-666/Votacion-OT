@@ -29,12 +29,10 @@ const getSuspender = (promise) => {
   
   export function fetchData(url, method = "GET", options = {}) {
     const { headers, body } = options;
-    console.log(url)
     const promise = fetch(url, {
       method,
-      headers: headers || { "Content-Type": "application/json", "Access-Control-Allow-Origin":"*" },
-      mode: "cors",
-      body: body ? JSON.stringify(body) : undefined,
+      headers: headers || { "Content-Type": "application/json"},
+      body: body ? JSON.stringify(body) : null,
     })
       .then((response) => {
         if (!response.ok) {

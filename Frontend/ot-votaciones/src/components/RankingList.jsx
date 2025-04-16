@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { useParticipant } from "../hooks/useParticipant";
 
 const RankingContainer = styled.div`
   width: 100%;
@@ -21,13 +22,10 @@ const Participant = styled(motion.div)`
   color: white;
 `;
 
-const participants = [
-  { name: "Participante 1", votes: 250 },
-  { name: "Participante 2", votes: 200 },
-  { name: "Participante 3", votes: 180 },
-];
 
 export default function RankingList() {
+  const {participants} = useParticipant();
+
   return (
     <RankingContainer>
       <h2>Ranking en Tiempo Real</h2>
