@@ -1,4 +1,3 @@
-#Pipeline to deploy the docker images in to ECS
 name: Push Docker Images to AWS ECR
 
 on:
@@ -15,17 +14,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up AWS CLI
+      - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Log in to Amazon ECR (Manual)
+      - name: Log in to Amazon ECR (Manual with STS support)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          echo "🟡 Verificando login con credenciales temporales..."
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build, Push and Create Repositories if Needed
         env:
@@ -33,27 +39,25 @@ jobs:
           IMAGE_TAG: latest
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          # Lista de microservicios (carpetas donde están los Dockerfiles)
           MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend")
 
           for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
-            REPO_NAME=$(basename $SERVICE_PATH)
+            REPO_NAME=$(basename "$SERVICE_PATH")
             IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
 
-            echo "Procesando $SERVICE_PATH -> $IMAGE_NAME"
+            echo "➡️ Procesando $SERVICE_PATH -> $IMAGE_NAME"
 
-            # Verifica si el repositorio existe; si no, lo crea
             if aws ecr describe-repositories --repository-names "$REPO_NAME" > /dev/null 2>&1; then
-              echo "Repositorio $REPO_NAME ya existe en ECR"
+              echo "✅ Repositorio $REPO_NAME ya existe"
             else
-              echo "Repositorio $REPO_NAME no existe. Creando..."
+              echo "🆕 Repositorio $REPO_NAME no existe. Creando..."
               aws ecr create-repository --repository-name "$REPO_NAME" --region "$AWS_REGION"
-              echo "Repositorio $REPO_NAME creado"
+              echo "✅ Repositorio $REPO_NAME creado"
             fi
 
-            echo "Construyendo imagen Docker para $REPO_NAME"
+            echo "🐳 Construyendo imagen Docker para $REPO_NAME"
             docker build -t "$IMAGE_NAME" "$SERVICE_PATH"
 
-            echo "Pushing $IMAGE_NAME a ECR"
+            echo "📤 Pushing $IMAGE_NAME a ECR"
             docker push "$IMAGE_NAME"
           done
