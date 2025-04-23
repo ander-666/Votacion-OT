@@ -56,13 +56,22 @@ export default function ParticipantModal({ participant, onClose, onVote }) { // 
   return (
     <ModalOverlay>
       <ModalContent>
-        <h2>{participant.name}</h2>
-        <ImageContainer>
-          <img src={participant.image} alt={participant.name} width="100%" height="100%" />
-        </ImageContainer>
-        <p>{participant.description}</p>
-        <Button onClick={() => onVote(participant)}>Votar</Button> {/* 🔹 Llama a `onVote` */}
-        <Button onClick={onClose}>Cerrar</Button>
+          {voteDone ? 
+            <>
+              <p>{voteText}</p>
+              <Button onClick={onClose}>Cerrar</Button>
+            </>
+            :
+            <>
+            <h2>{participant.name}</h2>
+            <ImageContainer>
+              <img src={`data:image/jpeg;base64,${participant.image}`} alt={participant.name} width="100%" height="100%" />
+            </ImageContainer>
+            <p>{participant.description}</p>
+            <Button onClick={handleVote}>Votar</Button>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+        }
       </ModalContent>
     </ModalOverlay>
   );

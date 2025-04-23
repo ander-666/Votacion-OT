@@ -62,7 +62,7 @@ export default function ParticipantCarousel() {
       <Slider {...settings}>
         {participants.map((participant) => (
           <ParticipantWrapper key={participant.participantId}>
-            <ParticipantImage src={participant.image} alt={participant.name} />
+            <ParticipantImage src={`data:image/jpeg;base64,${participant.image}`} alt={participant.name} />
           </ParticipantWrapper>
         ))}
       </Slider>
