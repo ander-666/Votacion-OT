@@ -30,9 +30,10 @@ public class SpringSecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowCredentials(true);
-                    config.setAllowedOrigins(List.of("http://localhost:8002", "http://localhost:5173")); // ✅ Permitir el frontend
+                    config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://kong",  "http://votacion-frontend*", "http://*.localhost")); // ✅ Permitir el frontend  ,"http://localhost:8002", "http://localhost:5173"
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+                    config.setExposedHeaders(List.of("Authorization", "Content-Length")); // opcional: exponer headers al cliente
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity, can be adjusted if necessary

@@ -176,25 +176,20 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
   --data "config.key_in_header=true" \
   --data "config.key_in_body=false"
 
-# Enable the CORS plugin on the backend-service
-#http://localhost:8002,http://localhost:8000,http://votacion-frontend,http://localhost,http://localhost:8180
-curl -X POST ${KONG_ADMIN_URL}/plugins \
+
+# Plugin CORS en el servicio backend-service (frontend → Kong)
+curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
-  --data "config.origins=*" \
+  --data "config.origins=http://localhost:8002, http://votacion-frontend, http://localhost:5173" \
   --data "config.methods[]=GET" \
-  --data "config.methods[]=HEAD" \
-  --data "config.methods[]=PUT" \
-  --data "config.methods[]=PATCH" \
   --data "config.methods[]=POST" \
+  --data "config.methods[]=PUT" \
   --data "config.methods[]=DELETE" \
   --data "config.methods[]=OPTIONS" \
-  --data "config.methods[]=TRACE" \
-  --data "config.methods[]=CONNECT" \
   --data "config.headers=Accept,Authorization,Content-Type" \
   --data "config.exposed_headers=Content-Length" \
   --data "config.credentials=true" \
   --data "config.max_age=3600"
-
 
 
 ##########################

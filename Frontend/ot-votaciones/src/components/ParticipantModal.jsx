@@ -1,4 +1,9 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
+import { useSession } from "../hooks/useSession";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
+import { useState } from "react";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -52,7 +57,45 @@ const Button = styled.button`
   }
 `;
 
-export default function ParticipantModal({ participant, onClose, onVote }) { // 🔹 Recibe `onVote`
+export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
+  const { isLoggedIn } = useSession()  
+  const [voteDone, setVoteDone] = useState(false)
+  const [voteText, setVoteText] = useState("")
+
+  const handleVote = () => {
+    if(isLoggedIn){
+      // setVoteDone(true)
+      // setVoteError(false)
+      try{
+        const voteData = fetchData(configData.API_URL+"/Votos", "POST",
+          { headers:
+              {
+                "Content-Type": "application/json"
+              },
+            body:
+              {
+                "galaId": configData.GALA_ID,
+                "participantId": participant.participantId
+              }
+        });
+        let voteResult = voteData.read()
+        setVoteText(voteResult)
+      }
+      catch{
+        setVoteText("Error al votar");
+      }
+      finally{
+        setVoteDone(true);
+      }
+    }
+    else{
+      onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
+      setTimeout(() => {
+        setShowLoginPopup(!isLoggedIn);
+      }, 200);
+    }  
+  };
+  
   return (
     <ModalOverlay>
       <ModalContent>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import ParticipantCard from "./ParticipantCard";
 import ParticipantModal from "./ParticipantModal";
 import styled from "styled-components";
+import { LoginPopup } from "./LoginPopup";
 import { useParticipant } from "../hooks/useParticipant";
 
 const Wrapper = styled.div`
@@ -33,29 +34,27 @@ const GridContainer = styled.div`
   margin: 0 auto;
 `;
 
-export default function ParticipantsGrid({ onVote }) { // 🔹 Recibe `onVote` de Home.jsx
-  const { participants, selectedParticipant, setSelectedParticipant } = useParticipant();
+export default function ParticipantsGrid() {
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const {participants, selectedParticipant, setSelectedParticipant} = useParticipant()
 
   return (
     <Wrapper>
       <Title>Participantes OT</Title>
-      <GridContainer>
-        {participants.map((participant) => (
-          <ParticipantCard
-            key={participant.participantId}
-            participant={participant}
-            onClick={() => setSelectedParticipant(participant)}
-          />
-        ))}
-      </GridContainer>
-
+        <GridContainer>
+          {participants.map((participant) => (
+            <ParticipantCard key={participant.participantId} participant={participant} onClick={() => setSelectedParticipant(participant)} />
+          ))}
+        </GridContainer>
       {selectedParticipant && (
         <ParticipantModal
           participant={selectedParticipant}
           onClose={() => setSelectedParticipant(null)}
-          onVote={onVote} // 🔹 Pasa `onVote` al modal
+          setShowLoginPopup={setShowLoginPopup}
         />
       )}
+
+      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
     </Wrapper>
   );
 }
