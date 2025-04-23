@@ -6,6 +6,8 @@ import Sidebar from "../components/Sidebar";
 import BackgroundParticles from "../components/BackgroundParticles";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { fetchData } from "../fetchData";
+import configData from "../config.json";
 
 // ANIMACIONES
 const fadeIn = {
@@ -46,19 +48,33 @@ const ChartWrapper = styled.div`
   justify-content: center;
 `;
 
+const VotesData = fetchData(configData.API_URL + "/votos");
+
 export default function Resultados() {
-  const [voteCounts, setVoteCounts] = useState({}); //fetchData(configData.API_URL+"/votes").read();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const changeMenuVisibility = () => setIsMenuOpen(!isMenuOpen);
 
-  useEffect(() => {
-    const votes = JSON.parse(localStorage.getItem("votes")) || {};
+  const countVotes = () => {
     const count = {};
-    Object.values(votes).forEach(vote => {
-      count[vote] = (count[vote] || 0) + 1;
+    const votes = VotesData.read();
+    votes.forEach(vote =>
+    {
+      if(vote.galaId === configData.GALA_ID)
+        count[vote.participantId] = (count[vote.participantId] || 0) + 1;
     });
-    setVoteCounts(count);
-  }, []);
+    return count;
+  }
+
+  const voteCounts = countVotes();
+
+  // useEffect(() => {
+  //   const votes = JSON.parse(localStorage.getItem("votes")) || {};
+  //   const count = {};
+  //   Object.values(votes).forEach(vote => {
+  //     count[vote] = (count[vote] || 0) + 1;
+  //   });
+  //   setVoteCounts(count);
+  // }, []);
 
   const totalVotes = Object.values(voteCounts).reduce((acc, count) => acc + count, 0);
 
@@ -67,7 +83,7 @@ export default function Resultados() {
       <BackgroundParticles />
       <ResultContainer>
         <button className="menuButton" onClick={changeMenuVisibility}>☰</button>
-        <Sidebar isOpen={isMenuOpen} />
+        <Sidebar isopen={isMenuOpen} />
 
         {/* TÍTULO ARRIBA EN EL CENTRO */}
         <motion.h1 variants={fadeIn} initial="hidden" animate="visible">

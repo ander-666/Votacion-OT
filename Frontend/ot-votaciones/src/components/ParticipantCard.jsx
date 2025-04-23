@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 
 const Card = styled.div`
@@ -46,7 +47,7 @@ export default function ParticipantCard({ participant, onClick }) {
     <Card onClick={() => onClick(participant)}>
       <ImageContainer>
         <img
-          src={participant.image || DefaultImage} // ✅ Si no hay imagen, se usa la por defecto
+          src={`data:image/jpeg;base64,${participant.image|| DefaultImage}`} // ✅ Si no hay imagen, se usa la por defecto
           alt={participant.name}
           width="100%"
           height="100%"
