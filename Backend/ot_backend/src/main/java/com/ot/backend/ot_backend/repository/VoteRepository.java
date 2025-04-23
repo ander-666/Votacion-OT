@@ -12,15 +12,13 @@ import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, VoteId> {
 
-    // Find a vote by galaId and votantId
+    // Encontrar un voto específico por galaId y votantId
     Optional<Vote> findByGalaIdAndVotantId(Long galaId, String votantId);
 
-    // Check if a user has already voted for a particular gala
+    // Comprobar si un usuario ya ha votado en una gala específica
     boolean existsByGalaIdAndVotantId(Long galaId, String votantId);
 
-    boolean existsById(VoteId voteId);
-
-
-    @Query("SELECT new com.ot.backend.ot_backend.dto.VoteResponseDto(v.galaId, v.participant.id, v.voteDate) FROM Vote v")
-    List<VoteResponseDto> findAllVotes();
+    // Obtener la cantidad de votos para cada concursante en una gala específica
+    @Query("SELECT v.participant.id, COUNT(v) FROM Vote v WHERE v.id.galaId = :galaId GROUP BY v.participant.id")
+    List<Object[]> countVotosPorConcursante(Long galaId);
 }
