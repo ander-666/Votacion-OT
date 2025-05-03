@@ -3,7 +3,7 @@ name: Push Docker Images to AWS ECR
 on:
   push:
     branches:
-      - tests_funcionales
+      - merge_branches
 
 jobs:
   push_to_ecr:
@@ -41,7 +41,7 @@ jobs:
           IMAGE_TAG: latest
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend")
+          MICROSERVICIOS=("kong-config")
           for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
             REPO_NAME=$(basename "$SERVICE_PATH")
             IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
