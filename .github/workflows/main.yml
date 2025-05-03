@@ -41,7 +41,7 @@ jobs:
           IMAGE_TAG: latest
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          MICROSERVICIOS=("kong-config")
+          MICROSERVICIOS=("kong-config" "Frontend/ot-votaciones" "Backend/ot_backend")
           for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
             REPO_NAME=$(basename "$SERVICE_PATH")
             IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
