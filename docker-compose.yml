@@ -150,16 +150,14 @@ services:
       - votacion-net
 
   kong-setup:
-    image: alpine:latest
+    build:
+      context: ./kong-setup/
+      dockerfile: Dockerfile
+    container_name: kong-setup
+    restart: always
     depends_on:
       kong:
         condition: service_healthy
-      #keycloak:
-      #  condition: service_healthy
-    entrypoint: ["/bin/sh"]
-    command: ["-c", "sleep 30 && /scripts/setup-kong-db.sh"]
-    volumes:
-      - ./kong-config:/scripts
     networks:
       - votacion-net
 
