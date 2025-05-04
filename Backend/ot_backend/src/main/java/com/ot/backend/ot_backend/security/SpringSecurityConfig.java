@@ -1,8 +1,5 @@
 package com.ot.backend.ot_backend.security;
 
-import java.util.List;
-
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,15 +23,6 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowCredentials(true);
-                    config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://kong",  "http://votacion-frontend*", "http://*.localhost")); // ✅ Permitir el frontend  ,"http://localhost:8002", "http://localhost:5173"
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-                    config.setExposedHeaders(List.of("Authorization", "Content-Length")); // opcional: exponer headers al cliente
-                    return config;
-                }))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity, can be adjusted if necessary
                 .authorizeHttpRequests((authorize) -> {
                     // Public authentication endpoints

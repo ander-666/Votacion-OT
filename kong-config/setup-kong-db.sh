@@ -50,13 +50,6 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "url=http://backend:8080" \
    --data "protocol=http"
 
-# Create a free Kong service for the backend API
-curl -i -X POST ${KONG_ADMIN_URL}/services \
-   --data "id=94157cc3-0e51-4950-8fdb-156f95987c09" \
-   --data "name=backend-free-service" \
-   --data "url=http://backend:8080/Participants" \
-   --data "protocol=http"
-
 # Create a Kong service for Keycloak
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
@@ -99,10 +92,13 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
 ### Backend Service Routes ###
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=backend-service" \
-    --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
-    --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
     --data "paths[]=/" \
     --data "strip_path=false"
+
+curl -s -X POST ${KONG_ADMIN_URL}/routes \
+    --data "service.name=backend-service" \
+    --data "paths[]=/Participants" \
+    --data "strip_path=false"
 
 
 
@@ -180,16 +176,12 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
 # Plugin CORS en el servicio backend-service (frontend → Kong)
 curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
-  --data "config.origins=http://localhost:8002, http://votacion-frontend, http://localhost:5173" \
-  --data "config.methods[]=GET" \
-  --data "config.methods[]=POST" \
-  --data "config.methods[]=PUT" \
-  --data "config.methods[]=DELETE" \
-  --data "config.methods[]=OPTIONS" \
-  --data "config.headers=Accept,Authorization,Content-Type" \
-  --data "config.exposed_headers=Content-Length" \
-  --data "config.credentials=true" \
-  --data "config.max_age=3600"
+  --data "config.origins=*" \
+# Ejemplo: Origen de Vite dev server http://localhost:5173,http://localhost:8002
+  --data "config.headers=Accept,Authorization,Content-Type" \
+  --data "config.exposed_headers=Content-Length" \
+  --data "config.credentials=false" \
+  --data "config.max_age=3600"
 
 
 ##########################
@@ -243,14 +235,14 @@ curl -s -X POST ${KONG_ADMIN_URL}/plugins \
 
 echo "Setting up API Key consumer..."
 
- Create an API Key consumer
+ #Create an API Key consumer
  curl -i -X POST ${KONG_ADMIN_URL}/consumers \
    --data "username=api-key-user"
 
- Generate an API Key for the consumer
+ #Generate an API Key for the consumer
  API_KEY_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/consumers/api-key-user/key-auth)
  API_KEY=$(echo "$API_KEY_RESPONSE" | jq -r '.key')
- Generate an API Key for the consumer
+ #Generate an API Key for the consumer
  API_KEY_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/consumers/api-key-user/key-auth)
  API_KEY=$(echo "$API_KEY_RESPONSE" | jq -r '.key')
 

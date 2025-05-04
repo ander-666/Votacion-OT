@@ -156,8 +156,8 @@ services:
         condition: service_healthy
       #keycloak:
       #  condition: service_healthy
-    entrypoint: ["/bin/sh", "-c"]
-    command: ["sleep 60 && /scripts/setup-kong-db.sh"]
+    entrypoint: ["/bin/sh"]
+    command: ["-c", "sleep 30 && /scripts/setup-kong-db.sh"]
     volumes:
       - ./kong-config:/scripts
     networks:
