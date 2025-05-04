@@ -79,3 +79,9 @@ hs_err_pid*
 ### 🗑️ Archivos del sistema (MacOS, Linux, Windows) ###
 .DS_Store
 Thumbs.db
+
+# Terraform local state & plugins
+.terraform/
+*.tfstate
+*.tfstate.backup
+
