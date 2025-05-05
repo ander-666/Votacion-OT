@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 import VoteResultsChart from "../components/VoteResultsChart";
 import VoteSummary from "../components/VoteSummary";
@@ -48,7 +49,7 @@ const ChartWrapper = styled.div`
   justify-content: center;
 `;
 
-const VotesData = fetchData(configData.API_URL + "/votos");
+const VotesData = fetchData(`${import.meta.env.VITE_KONG_ADDRESS}/votos`);
 
 export default function Resultados() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

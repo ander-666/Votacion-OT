@@ -1,8 +1,8 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
 import { useSession } from "../hooks/useSession";
 import { fetchData } from "../fetchData";
-import configData from "../config.json";
 import { useState } from "react";
 
 const ModalOverlay = styled.div`
@@ -67,7 +67,7 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
       // setVoteDone(true)
       // setVoteError(false)
       try{
-        const voteData = fetchData(configData.API_URL+"/Votos", "POST",
+        const voteData = fetchData(`${import.meta.env.VITE_KONG_ADDRESS}/Votos`, "POST",
           { headers:
               {
                 "Content-Type": "application/json"

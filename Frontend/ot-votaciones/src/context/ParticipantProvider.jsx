@@ -1,10 +1,10 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { ParticipantContext } from "./participantContext.js"
 import { fetchData } from "../fetchData";
-import configData from "../config.json";
 
-const participantsData = fetchData(configData.API_URL+"/Participants");
+const participantsData = fetchData(`${import.meta.env.VITE_KONG_ADDRESS}/Participants`);
 
 export function ParticipantProvider ({ children }) {
     const participants = participantsData.read()

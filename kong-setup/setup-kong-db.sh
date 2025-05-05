@@ -1,7 +1,7 @@
 #!/bin/sh
 
-KONG_ADMIN_URL="http://kong:8001"
-KEYCLOAK_URL="http://keycloak:8180/realms/votacion_ot"
+#KONG_ADMIN_URL="http://kong:8001"
+#KEYCLOAK_URL_REALM="http://keycloak:8180/realms/votacion_ot"
 
 ##########################
 # Install Dependencies
@@ -47,14 +47,14 @@ echo "Configuring Kong for OIDC (via JWT validation) and API Key..."
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=94157cc3-0e51-4950-8fdb-384f95987c09" \
    --data "name=backend-service" \
-   --data "url=http://backend:8080" \
+   --data "url=${BACKEND_URL}" \
    --data "protocol=http"
 
 # Create a Kong service for Keycloak
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
    --data "name=keycloak-service" \
-   --data "url=http://keycloak:8180" \
+   --data "url=${KEYCLOAK_URL}" \
    --data "protocol=http"
 
 
@@ -177,7 +177,6 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
 curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
   --data "config.origins=*" \
-# Ejemplo: Origen de Vite dev server http://localhost:5173,http://localhost:8002
   --data "config.headers=Accept,Authorization,Content-Type" \
   --data "config.exposed_headers=Content-Length" \
   --data "config.credentials=false" \
@@ -195,7 +194,7 @@ curl -s -X POST ${KONG_ADMIN_URL}/plugins \
 #   --data "username=keycloak"
 
 # Retrieve Keycloak's JWKS response and extract the signing key
-# JWKS_URL="${KEYCLOAK_URL}/protocol/openid-connect/certs"
+# JWKS_URL="${KEYCLOAK_URL_REALM}/protocol/openid-connect/certs"
 # JWKS_RESPONSE=$(curl -s "${JWKS_URL}")
 
 # X5C=$(echo "$JWKS_RESPONSE" | jq -r '.keys[] | select(.alg=="RS256" and .use=="sig") | .x5c[0]')
@@ -268,6 +267,6 @@ echo ""
 #echo "curl -X GET http://kong:8000/api/home?jwt=<your_valid_jwt>"
 #echo ""
 echo "For API Key authentication, use the generated API key (query param or header):"
-echo "curl -X GET http://kong:8000/api-key/home?apikey=$API_KEY"
+echo "curl -X GET ${KONG_PROXY_URL}/api-key/home?apikey=$API_KEY"
 echo "or"
-echo "curl -X GET http://kong:8000/api-key/home -H \"apikey: $API_KEY\""
+echo "curl -X GET ${KONG_PROXY_URL}/api-key/home -H \"apikey: $API_KEY\""
