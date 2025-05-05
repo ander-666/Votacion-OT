@@ -161,6 +161,20 @@ services:
     networks:
       - votacion-net
 
+  keycloak2:
+    build:
+      context: ./keycloak-realm/
+      dockerfile: Dockerfile
+    container_name: keycloak-realm
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - votacion-net
+
 networks:
   votacion-net:
 
