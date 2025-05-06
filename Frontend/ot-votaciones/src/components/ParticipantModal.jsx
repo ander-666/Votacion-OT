@@ -67,7 +67,7 @@ export default function ParticipantModal({ participant, onClose, setShowLoginPop
       // setVoteDone(true)
       // setVoteError(false)
       try{
-        const voteData = fetchData(`${import.meta.env.VITE_KONG_ADDRESS}/Votos`, "POST",
+        const voteData = fetchData(`${window.env?.VITE_KONG_ADDRESS}/Votos`, "POST",
           { headers:
               {
                 "Content-Type": "application/json"

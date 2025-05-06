@@ -100,7 +100,10 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "paths[]=/Participants" \
     --data "strip_path=false"
 
-
+curl -s -X POST ${KONG_ADMIN_URL}/routes \
+    --data "service.name=backend-service" \
+    --data "paths[]=/Votos" \
+    --data "strip_path=false"
 
  APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
  if [ -z "$APIKEY_ROUTE_ID" ]; then

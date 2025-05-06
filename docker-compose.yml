@@ -49,6 +49,8 @@ services:
         condition: service_healthy
     ports:
       - "8002:80"
+    environment:
+      VITE_KONG_ADDRESS: "http://localhost:8000" 
     networks:
       - votacion-net
 
@@ -158,6 +160,12 @@ services:
     depends_on:
       kong:
         condition: service_healthy
+    enviroment:
+      KONG_ADMIN_URL: "http://kong:8001"
+      KONG_PROXY_URL: "http://kong:8000"
+      BACKEND_URL: "http://backend:8080"
+      KEYCLOAK_URL: "http://keycloak:8180"
+      KEYCLOAK_URL_REALMS: "http://keycloak:8180/realms/votacion_ot"
     networks:
       - votacion-net
 

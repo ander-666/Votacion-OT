@@ -1,7 +1,7 @@
 import Keycloak from "keycloak-js";
 
 const keycloak = new Keycloak({
-  url: `${import.meta.env.VITE_KONG_ADDRESS}/auth`,
+  url: `${window.env?.VITE_KONG_ADDRESS}/auth`,
   realm: "votacion_ot",
   clientId: "web-client",
 });

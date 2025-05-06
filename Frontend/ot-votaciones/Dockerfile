@@ -1,38 +1,45 @@
+
 # Step 1: Build the React application
 FROM node:18 AS build
 
-# Set working directory to /app inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Instala todas las dependencias
 RUN npm install
 
-# Install vite separately
+# Instala paquetes adicionales (opcional, si ya están en package.json no es necesario)
 RUN npm install keycloak-js
-
-# Install vite separately
 RUN npm install vite
 
-# Copy the rest of your app files
 COPY . .
 
-# Build the React app for production (this generates the /build folder)
+# Construye la app de React
 RUN npm run build
 
 # Step 2: Serve the React app using nginx
 FROM nginx:alpine
 
-# Copy nginx configuration file
+# Instala envsubst (parte de gettext)
+RUN apk add --no-cache gettext
+
+# Copia la configuración de nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the build folder from the build stage to nginx's serving directory
+# Copia la build de React
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 80 for the web server
+# Copia plantilla de variables de entorno
+COPY env.template.js /usr/share/nginx/html/env.template.js
+
+# Copia el script de entrada
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expone el puerto 80
 EXPOSE 80
 
-# Run nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Usa el script como entrypoint (reemplaza CMD anterior)
+ENTRYPOINT ["/entrypoint.sh"]
+
