@@ -7,13 +7,13 @@ on:
       - main
   push:
     branches:
-      - merge_branches   # antes era merge_branches, ahora apuntamos a main
+      - merge_branches
 
 env:
   TF_WORKING_DIR: terraform
-  TF_VAR_aws_region:      ${{ secrets.AWS_REGION }}
-  TF_VAR_aws_access_key:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  TF_VAR_aws_secret_key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+  TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_VAR_aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
 
 jobs:
@@ -43,16 +43,12 @@ jobs:
           aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region:            ${{ secrets.AWS_REGION }}
 
-      - name: Terraform Init (remote state fixed)
+      - name: Terraform Init
         run: terraform init -input=false \
-          -backend-config="bucket=mi-bucket-terraform-state" \
+          -backend-config="bucket=mi-bucket-terraform" \
           -backend-config="key=ci/terraform.tfstate" \
           -backend-config="region=${{ secrets.AWS_REGION }}" \
-          -backend-config="dynamodb_table=mi-tabla-lock"
-
-      # ➡️ Destruye todo lo existente antes de volver a crear
-      - name: Terraform Destroy (clean slate)
-        run: terraform destroy -auto-approve
+          -backend-config="dynamodb_table=terraform-locks"
 
       - name: Terraform Validate
         run: terraform validate
@@ -75,8 +71,8 @@ jobs:
         with:
           name: terraform-plan
           path: |
-            tfplan
-            plan.txt
+            ${{ env.TF_WORKING_DIR }}/tfplan
+            ${{ env.TF_WORKING_DIR }}/plan.txt
 
       - name: Comment Plan on PR
         if: ${{ github.event_name == 'pull_request' }}
@@ -85,9 +81,8 @@ jobs:
           header: "Terraform Plan"
           message: |
             ```
-            ${{ steps.plan.outputs.stdout || 'Consulta plan.txt (artifact)' }}
+            ${{ steps.plan.outputs.stdout || 'Plan generado en plan.txt (artifact)' }}
             ```
 
       - name: Terraform Apply
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: terraform apply -input=false -auto-approve tfplan
