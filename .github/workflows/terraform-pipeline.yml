@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches:
-      - main
+      - merge_branches
 
 env:
   TF_WORKING_DIR: terraform

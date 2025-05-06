@@ -32,13 +32,30 @@ variable "aws_session_token" {
 variable "ecr_frontend_image" {
   description = "Ruta completa a la imagen del frontend en ECR (sin tag)"
   type        = string
+  default     = "664686881094.dkr.ecr.us-east-1.amazonaws.com/ot-votaciones"
 }
 
 variable "ecr_backend_image" {
   description = "Ruta completa a la imagen del backend en ECR (sin tag)"
   type        = string
+  default     = "664686881094.dkr.ecr.us-east-1.amazonaws.com/ot_backend"
+}
+variable "ecr_kong_image" {
+  description = "Ruta completa a la imagen del kong en ECR (sin tag)"
+  type        = string
+  default     = "664686881094.dkr.ecr.us-east-1.amazonaws.com/kong-config"
 }
 
+variable "ecr_kong_setup_image" {
+  description = "Ruta completa a la imagen del kong setup en ECR"
+  type        = string
+  default     = "664686881094.dkr.ecr.us-east-1.amazonaws.com/kong-setup"
+}
+variable "ecr_keyclok_setup_image" {
+  description = "Ruta completa a la imagen del backend en ECR (sin tag)"
+  type        = string
+  default     = "664686881094.dkr.ecr.us-east-1.amazonaws.com/keycloak-realm"
+}
 variable "ecr_frontend_image_tag" {
   description = "Tag de la imagen del frontend (ej: latest)"
   type        = string
@@ -49,21 +66,6 @@ variable "ecr_backend_image_tag" {
   description = "Tag de la imagen del backend (ej: latest)"
   type        = string
   default     = "latest"
-}
-
-variable "ecr_kong_image" {
-  description = "Ruta completa a la imagen del kong en ECR (sin tag)"
-  type        = string
-  default     = "latest"
-}
-
-variable "ecr_kong_setup_image" {
-  description = "Ruta completa a la imagen del kong setup en ECR"
-  type        = string
-}
-variable "ecr_keyclok_setup_image" {
-  description = "Ruta completa a la imagen del backend en ECR (sin tag)"
-  type        = string
 }
 
 variable "ecr_kong_image_tag" {
