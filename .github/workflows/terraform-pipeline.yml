@@ -3,6 +3,8 @@ name: Terraform CI/CD
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
   push:
     branches:
       - merge_branches
@@ -19,14 +21,19 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
 
     steps:
-      - name: Checkout
+      # 1. Checkout del repositorio (incluye submódulos si los hubiera)
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # 2. Instalación de Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.0 # pin to your version
+          terraform_version: 1.5.0
 
+      # 3. Credenciales de AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -34,39 +41,50 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # 4. Inicializar Terraform
       - name: Terraform Init
-        run: terraform init -input=false
+        run: terraform init -input=false -backend-config="key=ci/${{ github.sha }}"
 
+      # 5. Validar sintaxis y configuración
       - name: Terraform Validate
         run: terraform validate
 
+      # 6. Comprobar formato
       - name: Terraform Format Check
         run: terraform fmt -check
 
+      # 7. Generar plan y guardarlo en un archivo
       - name: Terraform Plan
         id: plan
         run: |
           terraform plan \
             -out=tfplan \
-            -input=false
+            -input=false \
+            -no-color
+          terraform show -no-color tfplan > plan.txt
 
+      # 8. Subir el plan como artifact (para inspección manual si falla algo)
       - name: Upload Plan Artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3
         with:
-          name: tfplan
-          path: ${{ env.TF_WORKING_DIR }}/tfplan
+          name: terraform-plan
+          path: |
+            ${{ env.TF_WORKING_DIR }}/tfplan
+            ${{ env.TF_WORKING_DIR }}/plan.txt
 
-      - name: Comment Plan (on PRs)
-        if: github.event_name == 'pull_request'
+      # 9. Comentar el plan en el PR (texto plano, sin HCL embebido)
+      - name: Comment Plan on PR
+        if: ${{ github.event_name == 'pull_request' }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: terraform plan
+          header: "Terraform Plan"
           message: |
-            ```hcl
-            ${{ steps.plan.outputs.stdout }}
+            ```
+            ${{ steps.plan.outputs.stdout || 'Plan generado en plan.txt (artifact)' }}
             ```
 
+      # 10. Aplicar cambios sólo en main y en push
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: terraform apply -input=false -auto-approve tfplan
