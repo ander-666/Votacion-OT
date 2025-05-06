@@ -92,5 +92,5 @@ jobs:
 
       # 10. Aplicar cambios sólo en main y en push
       - name: Terraform Apply
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: terraform apply -input=false -auto-approve tfplan
