@@ -1,0 +1,87 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### 🚀 Maven ###
+.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+dependency-reduced-pom.xml
+
+### 🔥 STS (Spring Tool Suite) ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### 💡 IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### 🛠️ NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### 💻 VS Code ###
+.vscode/
+.history/
+*.code-workspace
+*.swp
+/.classpath
+/.project
+/.settings
+/.factorypath
+
+### 🐳 Docker ###
+.dockerignore
+docker-compose.override.yml
+docker-volume/
+docker-network/
+
+### 🛢️ PostgreSQL (BD) ###
+*.pgdata/
+/pgdata/
+/data/
+
+### 📜 Logs y archivos de depuración ###
+logs/
+*.log
+*.out
+*.err
+hs_err_pid*
+
+### 🔐 Archivos de configuración local ###
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+### 📦 Archivos empaquetados ###
+*.jar
+*.war
+*.ear
+
+### 🗑️ Archivos del sistema (MacOS, Linux, Windows) ###
+.DS_Store
+Thumbs.db
+
+# Terraform local state & plugins
+.terraform/
+*.tfstate
+*.tfstate.backup
+
