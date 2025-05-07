@@ -116,14 +116,6 @@ jobs:
             ${{ env.TF_WORKING_DIR }}/tfplan
             ${{ env.TF_WORKING_DIR }}/plan.txt
 
-      - name: Comment Plan on PR
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: "Terraform Plan"
-          message: |
-            Plan output attached as an artifact (name: `terraform-plan`).
-
   terraform-apply:
     name: Terraform Apply (requires approval)
     runs-on: ubuntu-latest
