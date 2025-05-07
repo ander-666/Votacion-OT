@@ -46,21 +46,25 @@ module "ecs" {
 
   # ----- red -----
   # vpc_id       = module.network.vpc_id
-  vpc_id                      = module.rds_database.rds_vpc_id
-  ecs_sg_id                   = module.network.ecs_sg_id # idem
-  aws_region                  = var.aws_region
-  subnet_ids                  = module.network.subnet_ids
-  rds_database                = module.rds_database.rds_instance_data
-  ecs_task_execution_role_arn = var.ecs_task_execution_role_arn
-  ecr_frontend_image_tag      = var.ecr_frontend_image_tag
-  ecr_backend_image_tag       = var.ecr_backend_image_tag
-  ecr_kong_image_tag          = var.ecr_kong_image_tag
-  dns_name                    = module.network.alb_dns_name
-  lb_target_group_frontend    = module.network.tg_frontend_arn
-  lb_target_group_backend     = module.network.tg_backend_arn
-  lb_target_group_kong        = module.network.tg_kong_arn
-  lb_target_group_keycloak    = module.network.tg_keycloak_arn
-  lb_target_group_kong_admin  = module.network.tg_kong_admin_arn
+  vpc_id                       = module.rds_database.rds_vpc_id
+  ecs_sg_id                    = module.network.ecs_sg_id # idem
+  aws_region                   = var.aws_region
+  subnet_ids                   = module.network.subnet_ids
+  rds_database                 = module.rds_database.rds_instance_data
+  ecs_task_execution_role_arn  = var.ecs_task_execution_role_arn
+  ecr_frontend_image_tag       = var.ecr_frontend_image_tag
+  ecr_backend_image_tag        = var.ecr_backend_image_tag
+  ecr_kong_image_tag           = var.ecr_kong_image_tag
+  dns_name                     = module.network.alb_dns_name
+  lb_target_group_frontend     = module.network.tg_frontend_arn
+  lb_target_group_backend      = module.network.tg_backend_arn
+  lb_target_group_kong         = module.network.tg_kong_arn
+  lb_target_group_keycloak     = module.network.tg_keycloak_arn
+  lb_target_group_kong_admin   = module.network.tg_kong_admin_arn
+  public_dns_name              = module.load_balancer.public_dns_name
+  lb_target_group_front_public = module.load_balancer.tg_frontend_public_arn
+  lb_target_group_kong_public  = module.load_balancer.tg_kong_public_arn
+
 
   # ----- imágenes ECR -----
   ecr_frontend_image      = var.ecr_frontend_image

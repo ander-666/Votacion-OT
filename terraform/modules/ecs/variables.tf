@@ -43,6 +43,11 @@ variable "dns_name" {
   description = "DNS internoi de ALB"
   type        = string
 }
+
+variable "public_dns_name" {
+  description = "DNS internoi de ALB"
+  type        = string
+}
 variable "lb_target_group_backend" {
   description = "Target group del balanceador interno "
   type        = string
@@ -60,6 +65,16 @@ variable "lb_target_group_keycloak" {
   type        = string
 }
 variable "lb_target_group_kong_admin" {
+  description = "Target group del balanceador interno "
+  type        = string
+}
+
+variable "lb_target_group_kong_public" {
+  description = "Target group del balanceador interno "
+  type        = string
+}
+
+variable "lb_target_group_front_public" {
   description = "Target group del balanceador interno "
   type        = string
 }
