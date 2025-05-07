@@ -12,6 +12,8 @@ Este proyecto es una aplicación web full-stack que permite a los usuarios votar
 - **Autenticación**: Keycloak
 - **API Gateway**: Kong
 - **Contenedores**: Docker + Docker Compose
+- **Infraestructura**: Terraform
+- **Despliegue**: AWS
 
 ---
 
