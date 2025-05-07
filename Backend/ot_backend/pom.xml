@@ -49,7 +49,7 @@
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
 		</profile>
-				<profile>
+		<profile>
 			<id>test</id>
 			<properties>
 				<spring.profiles.active>test</spring.profiles.active>
@@ -221,6 +221,22 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.7.3.0</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnError>true</failOnError>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

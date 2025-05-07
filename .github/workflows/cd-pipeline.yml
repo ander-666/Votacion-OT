@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CD Pipeline Terraform
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
+      - merge_branches
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -62,11 +63,10 @@ jobs:
             echo "Pushing $IMAGE_NAME a ECR"
             docker push "$IMAGE_NAME"
           done
-  terraform:
-    name: Terraform
+  terraform-plan:
+    name: Terraform Plan
     runs-on: ubuntu-latest
-    needs: push_to_ecr
-    
+    # needs: push_to_ecr
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -109,13 +109,12 @@ jobs:
           terraform show -no-color tfplan > plan.txt
 
       - name: Upload Plan Artifact
-        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
           path: |
-            ${{ env.TF_WORKING_DIR }}/tfplan
-            ${{ env.TF_WORKING_DIR }}/plan.txt
+            tfplan
+            plan.txt
 
       - name: Comment Plan on PR
         if: ${{ github.event_name == 'pull_request' }}
@@ -123,15 +122,51 @@ jobs:
         with:
           header: "Terraform Plan"
           message: |
-            ${{ steps.plan.outputs.stdout || 'Plan generado en plan.txt (artifact)' }}
+            Plan output attached as an artifact (name: `terraform-plan`).
+
+  terraform-apply:
+    name: Terraform Apply (requires approval)
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: .
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config="key=ci/${{ github.sha }}"
 
       - name: Terraform Apply
-        if: github.event_name == 'push' && contains(github.ref, 'main')
         run: terraform apply -input=false -auto-approve tfplan
 
       - name: Upload Terraform State
-        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: terraform-state
-          path: ${{ env.TF_WORKING_DIR }}/terraform.tfstate
+          path: terraform.tfstate
