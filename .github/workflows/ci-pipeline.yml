@@ -70,18 +70,22 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Run Checkstyle
+        working-directory: Backend/ot_backend   
         continue-on-error: true
         run: mvn -q checkstyle:check
 
       - name: Run PMD
+        working-directory: Backend/ot_backend   
         continue-on-error: true
         run: mvn -q pmd:check
 
       - name: Run SpotBugs
+        working-directory: Backend/ot_backend   
         continue-on-error: true
         run: mvn -q spotbugs:check
 
       - name: OWASP Dependency-Check
+        working-directory: Backend/ot_backend   
         continue-on-error: true
         run: mvn -q org.owasp:dependency-check-maven:check -Ddependency-check.failBuildOnCVSS=7
 
