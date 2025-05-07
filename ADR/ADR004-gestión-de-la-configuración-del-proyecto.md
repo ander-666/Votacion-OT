@@ -10,7 +10,7 @@
 
 Historia técnica: N/A
 
-## Contexto y planteamiento delpProblema
+## Contexto y planteamiento del Problema
 
 Tras haber elgido GitHub como plataforma de control de versiones y GithubProjects como herrmaienta de gestión asociada, es necesario realizar una correcta configuración tanto del dashboard del proyecto como de la estrategia y reglas de branching que deben de seguir los miembros del equipo. Para ello es necesario especificar las normas y estrategias seguidas asi como definir plazos y responsabilidades, todo ello reflejado en la medida de los posible a traves de la configuración de las herramientas de gestión.
 

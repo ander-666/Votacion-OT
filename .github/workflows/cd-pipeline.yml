@@ -1,0 +1,164 @@
+name: CD Pipeline Terraform
+
+on:
+  push:
+    branches:
+      - main
+      - merge_branches
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  TF_WORKING_DIR: terraform
+  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+  TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_VAR_aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+
+jobs:
+  push_to_ecr:
+    name: Build and Push Docker Images to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION \
+            | docker login --username AWS \
+              --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build, Push and Create Repositories if Needed
+        env:
+          ECR_REGISTRY: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          IMAGE_TAG: latest
+        run: |
+          MICROSERVICIOS=("Frontend/ot-votaciones" "Backend/ot_backend" "kong-config" "kong-setup" "keycloak-realm")
+          for SERVICE_PATH in "${MICROSERVICIOS[@]}"; do
+            REPO_NAME=$(basename "$SERVICE_PATH")
+            IMAGE_NAME="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+            echo "Procesando $SERVICE_PATH → $IMAGE_NAME"
+            if aws ecr describe-repositories --repository-names "$REPO_NAME" > /dev/null 2>&1; then
+              echo "Repositorio $REPO_NAME ya existe"
+            else
+              echo "Creando repositorio $REPO_NAME..."
+              aws ecr create-repository --repository-name "$REPO_NAME" --region "$AWS_REGION"
+            fi
+            echo "Construyendo imagen para $REPO_NAME"
+            docker build -t "$IMAGE_NAME" "$SERVICE_PATH"
+            echo "Pushing $IMAGE_NAME a ECR"
+            docker push "$IMAGE_NAME"
+          done
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    # needs: push_to_ecr
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config="key=ci/${{ github.sha }}"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan \
+            -out=tfplan \
+            -input=false \
+            -no-color
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: |
+            ${{ env.TF_WORKING_DIR }}/tfplan
+            ${{ env.TF_WORKING_DIR }}/plan.txt
+
+  terraform-apply:
+    name: Terraform Apply (requires approval)
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config="key=ci/${{ github.sha }}"
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve tfplan
+
+      - name: Upload Terraform State
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-state
+          path: terraform.tfstate
