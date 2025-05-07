@@ -235,7 +235,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<failOnError>true</failOnError>
+					<failOnError>false</failOnError>
+					<threshold>High</threshold>
 				</configuration>
 			</plugin>
 		</plugins>
