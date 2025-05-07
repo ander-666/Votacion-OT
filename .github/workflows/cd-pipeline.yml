@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
+      - merge_branches
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
-      - merge_branches
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
