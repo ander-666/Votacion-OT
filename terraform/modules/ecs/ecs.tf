@@ -83,7 +83,7 @@ resource "aws_ecs_task_definition" "frontend" {
         }
       ]
       environment = [
-        { name = "VITE_KONG_ADDRESS", value = "http://${var.dns_name}:8000" },
+        { name = "VITE_KONG_ADDRESS", value = "http://${var.public_dns_name}:8000" },
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -344,6 +344,12 @@ resource "aws_ecs_service" "frontend" {
     container_name   = "frontend"
     container_port   = var.frontend_container_port
   }
+
+  load_balancer {
+    target_group_arn = var.lb_target_group_front_public
+    container_name   = "frontend"
+    container_port   = var.frontend_container_port
+  }
   depends_on = [aws_ecs_service.backend]
 
 }
@@ -383,6 +389,12 @@ resource "aws_ecs_service" "kong" {
 
   load_balancer {
     target_group_arn = var.lb_target_group_kong
+    container_name   = "kong"
+    container_port   = var.kong_container_port
+  }
+
+  load_balancer {
+    target_group_arn = var.lb_target_group_kong_public
     container_name   = "kong"
     container_port   = var.kong_container_port
   }
