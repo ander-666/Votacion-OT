@@ -46,20 +46,20 @@ public class VoteService {
         return "Voto registrado con éxito";
     }
 
-    public List<ResultadoVotacionDto> obtenerResultadosVotacion(Long galaId) {
-        List<Object[]> resultados = voteRepository.countVotosPorConcursante(galaId);
-        List<ResultadoVotacionDto> resultadoVotacionDTOs = new ArrayList<>();
+    // public List<ResultadoVotacionDto> obtenerResultadosVotacion(Long galaId) {
+    //     List<Object[]> resultados = voteRepository.countVotosPorConcursante(galaId);
+    //     List<ResultadoVotacionDto> resultadoVotacionDTOs = new ArrayList<>();
 
-        for (Object[] resultado : resultados) {
-            Long participantId = (Long) resultado[0];
-            Long votos = (Long) resultado[1];
-            Participant participant = participantRepository.findById(participantId).orElse(null);
+    //     for (Object[] resultado : resultados) {
+    //         Long participantId = (Long) resultado[0];
+    //         Long votos = (Long) resultado[1];
+    //         Participant participant = participantRepository.findById(participantId).orElse(null);
 
-            if (participant != null) {
-                ResultadoVotacionDto dto = new ResultadoVotacionDto(participant.getName(), votos);
-                resultadoVotacionDTOs.add(dto);
-            }
-        }
-        return resultadoVotacionDTOs;
-    }
+    //         if (participant != null) {
+    //             ResultadoVotacionDto dto = new ResultadoVotacionDto(participant.getName(), votos);
+    //             resultadoVotacionDTOs.add(dto);
+    //         }
+    //     }
+    //     return resultadoVotacionDTOs;
+    // }
 }

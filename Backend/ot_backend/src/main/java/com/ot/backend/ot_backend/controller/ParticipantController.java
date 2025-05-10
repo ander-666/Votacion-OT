@@ -1,11 +1,14 @@
 package com.ot.backend.ot_backend.controller;
 
-import com.ot.backend.ot_backend.service.ParticipantService;
+import com.ot.backend.ot_backend.repository.ParticipantRepository;
+
 import jakarta.servlet.http.HttpServletRequest;
-import com.ot.backend.ot_backend.domain.Participant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.ot.backend.ot_backend.domain.Participant;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,19 +19,22 @@ import java.util.Map;
 public class ParticipantController {
 
     @Autowired
-    private ParticipantService participantService;
+    private ParticipantRepository participantRepository;
 
     @GetMapping
     public List<Participant> obtenerParticipants() {
-        return participantService.obtenerParticipants();
+        return participantRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Participant> obtenerParticipantPorId(@PathVariable Long id) {
+        Participant participant = participantRepository.findById(id).orElse(null);
 
-        return participantService.obtenerParticipantPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        if (participant == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(participant);
     }
 
     @GetMapping("/check-tokens")
@@ -42,6 +48,6 @@ public class ParticipantController {
 
     @PostMapping
     public Participant crearParticipant(@RequestBody Participant participant) {
-        return participantService.crearParticipant(participant);
+        return participantRepository.save(participant);
     }
 }
