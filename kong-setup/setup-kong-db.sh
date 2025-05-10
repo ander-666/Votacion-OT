@@ -50,6 +50,13 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "url=${BACKEND_URL}" \
    --data "protocol=http"
 
+# Create a free Kong service for the backend API
+curl -i -X POST ${KONG_ADMIN_URL}/services \
+   --data "id=94157cc3-0e51-4950-8fdb-156f95987c09" \
+   --data "name=backend-free-service" \
+   --data "url=http://${BACKEND_URL}/Participants" \
+   --data "protocol=http"
+
 # Create a Kong service for Keycloak
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
@@ -92,18 +99,20 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
 ### Backend Service Routes ###
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=backend-service" \
+    --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
+    --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
     --data "paths[]=/" \
     --data "strip_path=false"
 
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "paths[]=/Participants" \
-    --data "strip_path=false"
+# curl -s -X POST ${KONG_ADMIN_URL}/routes \
+#     --data "service.name=backend-service" \
+#     --data "paths[]=/Participants" \
+#     --data "strip_path=false"
 
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "paths[]=/Votos" \
-    --data "strip_path=false"
+# curl -s -X POST ${KONG_ADMIN_URL}/routes \
+#     --data "service.name=backend-service" \
+#     --data "paths[]=/Votos" \
+#     --data "strip_path=false"
 
  APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
  if [ -z "$APIKEY_ROUTE_ID" ]; then
@@ -176,14 +185,24 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
   --data "config.key_in_body=false"
 
 
-# Plugin CORS en el servicio backend-service (frontend → Kong)
-curl -s -X POST ${KONG_ADMIN_URL}/plugins \
+# Enable the CORS plugin on the backend-service
+#http://localhost:8002,http://localhost:8000,http://votacion-frontend,http://localhost,http://localhost:8180
+curl -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
-  --data "config.origins=*" \
-  --data "config.headers=Accept,Authorization,Content-Type" \
-  --data "config.exposed_headers=Content-Length" \
-  --data "config.credentials=false" \
-  --data "config.max_age=3600"
+  --data "config.origins=*" \
+  --data "config.methods[]=GET" \
+  --data "config.methods[]=HEAD" \
+  --data "config.methods[]=PUT" \
+  --data "config.methods[]=PATCH" \
+  --data "config.methods[]=POST" \
+  --data "config.methods[]=DELETE" \
+  --data "config.methods[]=OPTIONS" \
+  --data "config.methods[]=TRACE" \
+  --data "config.methods[]=CONNECT" \
+  --data "config.headers=Accept,Authorization,Content-Type" \
+  --data "config.exposed_headers=Content-Length" \
+  --data "config.credentials=true" \
+  --data "config.max_age=3600"
 
 
 ##########################
