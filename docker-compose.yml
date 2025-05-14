@@ -48,7 +48,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      VITE_KONG_ADDRESS: "http://kong:8000"
+      VITE_KONG_ADDRESS: "http://localhost:8000"
     ports:
       - "8002:80"
     networks:
@@ -88,7 +88,7 @@ services:
       test: ["CMD-SHELL", "curl --fail http://localhost:8180/realms/votacion_ot"]
       interval: 10s
       retries: 10
-      start_period: 60s
+      start_period: 10s
     volumes:
       - ./keycloak-realm:/opt/keycloak/data/import
       - ./keycloak-logs:/opt/keycloack/standalone/log
@@ -159,7 +159,6 @@ services:
       context: ./kong-setup/
       dockerfile: Dockerfile
     container_name: kong-setup
-    restart: always
     depends_on:
       kong:
         condition: service_healthy

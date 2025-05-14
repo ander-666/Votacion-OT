@@ -183,6 +183,7 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
   --data "config.key_in_query=true" \
   --data "config.key_in_header=true" \
   --data "config.key_in_body=false"
+  
 
 
 # Enable the CORS plugin on the backend-service
