@@ -32,42 +32,5 @@ public class VoteController {
         return voteRepository.findAllVotes();
     }
     
-    @PostMapping
-    public ResponseEntity<String> votar(@Valid @RequestBody VoteDto voteDto, HttpServletRequest request,
-                                        @RequestParam(value = "apikey", required = false) String apiKey) {
-        if (apiKey == null || apiKey.isEmpty()) {
-            apiKey = request.getParameter("apikey");
-        }
-
-
-        String idToken = (apiKey == null || apiKey.isEmpty()) ? request.getHeader("X-Id-Token") : null;
-
-
-        if ((apiKey == null || apiKey.isEmpty()) && (idToken == null || idToken.isEmpty())) {
-            return ResponseEntity.status(401).body("API Key or ID Token is missing");
-        }
-        
-        String votantId = (apiKey != null && !apiKey.isEmpty()) ? apiKey : idToken;
-
-        Optional<Participant> participantOpt = participantRepository.findById(voteDto.getParticipantId());
-        if (participantOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Concursante no encontrado");
-        }
-
-        VoteId voteId = new VoteId(voteDto.getGalaId(), votantId);
-
-        if (voteRepository.existsById(voteId)) {
-            return ResponseEntity.badRequest().body("Ya has votado en esta gala");
-        }
-
-        Vote vote = new Vote();
-        vote.setGalaId(voteDto.getGalaId());
-        vote.setVotantId(votantId);
-        vote.setParticipant(participantOpt.get());
-        vote.setVoteDate(Instant.now());
-
-        voteRepository.save(vote);
-
-        return ResponseEntity.ok("Voto registrado exitosamente");
-    }
+    
 }

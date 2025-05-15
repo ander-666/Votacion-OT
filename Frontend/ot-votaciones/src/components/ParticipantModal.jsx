@@ -84,11 +84,12 @@ export default function ParticipantModal({ participant, onClose }) {
 
       console.log("Token actual", keycloak.token);
 
-      const response = await fetch(`${window.env?.VITE_KONG_ADDRESS}/auth/votos`, {
+      const response = await fetch(`${window.env?.VITE_KONG_ADDRESS}/protected/votar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${keycloak.token}`
+          "Authorization": `Bearer ${keycloak.token}`,
+          "X-Id-Token": keycloak.idToken
         },
         body: JSON.stringify({
           galaId: configData.GALA_ID,

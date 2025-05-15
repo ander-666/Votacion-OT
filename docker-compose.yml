@@ -143,6 +143,7 @@ services:
       KEYCLOAK_URL: "http://keycloak:8180/realms/votacion_ot"
       KONG_PG_SSL: "on"
       KONG_PG_SSL_VERIFY: "off"
+      KONG_PLUGINS: "bundled,oidc"
     ports:
       - "8000:8000"
       - "8001:8001"
