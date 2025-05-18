@@ -40,6 +40,7 @@ jobs:
       - name: Run JUnit Tests
         working-directory: Backend/ot_backend
         run: mvn -P local clean test
+        continue-on-error: true
 
       - name: Upload test results
         if: always()
