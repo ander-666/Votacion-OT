@@ -91,8 +91,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
-        run: terraform init -input=false -backend-config="key=ci/${{ github.sha }}"
-
+        run: terraform init -backend-config="bucket=bucket-terraform-state-votacion-ot" -backend-config="key=microservices/terraform.tfstate" -backend-config="region=${{env.AWS_REGION}}"
       - name: Terraform Validate
         run: terraform validate
 
