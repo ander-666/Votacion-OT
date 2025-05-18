@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import { useSession } from "../hooks/useSession";
 import configData from "../config.json";
