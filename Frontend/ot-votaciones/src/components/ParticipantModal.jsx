@@ -6,7 +6,6 @@ import configData from "../config.json";
 
 import keycloak from "../hooks/keycloak";
 import { useState } from "react";
-import { fetchData } from "../fetchData";
 
 const ModalOverlay = styled.div`
   position: fixed;
