@@ -1,6 +1,8 @@
 import styled from "styled-components";
+import { useSession } from "../hooks/useSession";
 import configData from "../config.json";
-import { ensureKeycloakInit } from "../hooks/keycloak";
+
+import keycloak from "../hooks/keycloak";
 import { useState } from "react";
 
 const ModalOverlay = styled.div`
@@ -56,6 +58,7 @@ const Button = styled.button`
 `;
 
 export default function ParticipantModal({ participant, onClose }) {
+  const { isLoggedIn } = useSession();
   const [voteDone, setVoteDone] = useState(false);
   const [voteText, setVoteText] = useState("");
   const [hasVoted, setHasVoted] = useState(false);
@@ -63,9 +66,7 @@ export default function ParticipantModal({ participant, onClose }) {
   const handleVote = async () => {
     console.log("Votación iniciada");
 
-    const keycloak = await ensureKeycloakInit();
-
-    if (!keycloak.authenticated) {
+    if (!keycloak.token) {
       console.log("Votacion: no estas logeado");
       onClose();
       keycloak.login();
@@ -73,7 +74,11 @@ export default function ParticipantModal({ participant, onClose }) {
     }
 
     try {
+      // Asegurar que el token esté actualizado
       await keycloak.updateToken(30);
+
+      console.log("Votacion: llamando a API");
+
       console.log("Token actual", keycloak.token);
 
       const response = await fetch(`${window.env?.VITE_KONG_ADDRESS}/protected/votar`, {
@@ -89,17 +94,24 @@ export default function ParticipantModal({ participant, onClose }) {
         })
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", [...response.headers.entries()]);
+
       const resultText = await response.text();
+      console.log("Response body:", resultText);
       if (!response.ok) {
-        setVoteText(resultText.includes("Ya has votado")
-          ? "Ya has votado en esta gala."
-          : "Error al votar."
-        );
-        setHasVoted(true);
+        if (resultText.includes("Ya has votado")) {
+          setHasVoted(true);
+          setVoteText("Ya has votado en esta gala.");
+        } else {
+          setVoteText("Error al votar.");
+        }
       } else {
         setVoteText(resultText);
         setHasVoted(true);
       }
+
+      console.log("Voto registrado");
 
     } catch (error) {
       console.error("Error al votar:", error);

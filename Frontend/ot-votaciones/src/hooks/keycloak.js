@@ -1,36 +1,17 @@
-// src/hooks/keycloak.js
 import Keycloak from "keycloak-js";
 
-let keycloak = null;
+const keycloak = new Keycloak({
+  url: `${window.env?.VITE_KONG_ADDRESS}/auth`,
+  realm: "votacion_ot",
+  clientId: "web-client",
+  enableInsecureHTTPS: true        // permite HTTP inseguro
+});
 
-export function getKeycloak() {
-  if (!keycloak) {
-    keycloak = new Keycloak({
-      url: `${window.env?.VITE_KONG_ADDRESS}/auth`,
-      realm: "votacion_ot",
-      clientId: "web-client",
-      enableInsecureHTTPS: true
-    });
-  }
-  return keycloak;
-}
+keycloak.init({
+  onLoad: "login-required",
+  checkLoginIframe: false,
+  pkceMethod: false      // ② usar PKCE “plain” sin Web Crypto API
+})
+  .catch(err => console.error("Keycloak init error:", err));
 
-export async function ensureKeycloakInit() {
-  const kc = getKeycloak();
-
-  // Solo inicializa si no lo ha hecho antes
-  if (!kc.token) {
-    try {
-      await kc.init({
-        onLoad: "check-sso",
-        checkLoginIframe: false,
-        pkceMethod: false,
-        flow: "implicit"
-      });
-    } catch (err) {
-      console.error("Keycloak init error:", err);
-    }
-  }
-
-  return kc;
-}
+export default keycloak;
