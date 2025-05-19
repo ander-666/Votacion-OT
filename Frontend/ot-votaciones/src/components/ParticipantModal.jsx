@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { useSession } from "../hooks/useSession";
 import configData from "../config.json";
 
 import keycloak from "../hooks/keycloak";
@@ -58,7 +57,6 @@ const Button = styled.button`
 `;
 
 export default function ParticipantModal({ participant, onClose }) {
-  const { isLoggedIn } = useSession();
   const [voteDone, setVoteDone] = useState(false);
   const [voteText, setVoteText] = useState("");
   const [hasVoted, setHasVoted] = useState(false);
