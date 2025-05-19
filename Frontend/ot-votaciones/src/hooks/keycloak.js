@@ -10,7 +10,7 @@ const keycloak = new Keycloak({
 keycloak.init({
   onLoad: "login-required",
   checkLoginIframe: false,
-  pkceMethod: false      // ② usar PKCE “plain” sin Web Crypto API
+  pkceMethod: false, // ② usar PKCE “plain” sin Web Crypto API    
 })
   .catch(err => console.error("Keycloak init error:", err));
 

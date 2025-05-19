@@ -1,27 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import keycloak from "./keycloak";
 
-let isKeycloakInitialized = false;
-
 export function useSession() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!keycloak.token);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    if (!isKeycloakInitialized) {
-      keycloak
-        .init({ onLoad: "check-sso", silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html" })
-        .then(authenticated => {
-          setIsLoggedIn(authenticated);
-          if (authenticated) {
-            setUser(keycloak.tokenParsed);
-          }
-        })
-        .catch(err => console.error("Keycloak init error:", err));
-
-      isKeycloakInitialized = true;
+  const login = async () => {
+    try {
+      const authenticated = await keycloak.init({
+        onLoad: "login-required",
+        checkLoginIframe: false,
+        pkceMethod: false
+      });
+      if (authenticated) {
+        setIsLoggedIn(true);
+        setUser(keycloak.tokenParsed);
+      }
+    } catch (err) {
+      console.error("Keycloak login error:", err);
     }
-  }, []);
+  };
 
-  return { isLoggedIn, user, login: keycloak.login, logout: keycloak.logout };
+  const logout = () => {
+    keycloak.logout();
+    setIsLoggedIn(false);
+    setUser(null);
+  };
+
+  return { isLoggedIn, user, login, logout };
 }
