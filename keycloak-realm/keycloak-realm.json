@@ -555,7 +555,7 @@
       "attributes": {
         "realm_client": "false",
         "post.logout.redirect.uris": "+",
-        "pkce.code.challenge.method": "S256"
+        "pkce.code.challenge.method": false
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -739,7 +739,7 @@
         "realm_client": "false",
         "client.use.lightweight.access.token.enabled": "true",
         "post.logout.redirect.uris": "+",
-        "pkce.code.challenge.method": "S256"
+        "pkce.code.challenge.method": false
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
