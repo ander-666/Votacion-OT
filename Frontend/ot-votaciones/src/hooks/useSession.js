@@ -10,6 +10,7 @@ export function useSession() {
   useEffect(() => {
     if (!isKeycloakInitialized) {
       keycloak
+        .init({ onLoad: "check-sso", silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html" })
         .then(authenticated => {
           setIsLoggedIn(authenticated);
           if (authenticated) {
