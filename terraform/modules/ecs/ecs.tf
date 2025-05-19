@@ -246,8 +246,8 @@ resource "aws_ecs_task_definition" "keycloak" {
       ]
 
       environment = [
-        { name = "KEYCLOAK_ADMIN", value = "user" },
-        { name = "KEYCLOAK_ADMIN_PASSWORD", value = "password" },
+        { name = "KC_BOOTSTRAP_ADMIN_USERNAME", value = "user" },
+        { name = "KC_BOOTSTRAP_ADMIN_PASSWORD", value = "password" },
         { name = "KC_DB", value = "postgres" },
         { name = "KC_DB_URL_HOST", value = var.rds_instance_data },
         { name = "KC_DB_URL_PORT", value = "5432" },
@@ -260,14 +260,19 @@ resource "aws_ecs_task_definition" "keycloak" {
         { name = "KC_HEALTH_ENABLED", value = "true" },
         { name = "KEYCLOAK_IMPORT", value = "/opt/keycloak/data/import/keycloak-realm.json" },
         { name = "KONG_URL", value = var.dns_name },
+        { name = "KC_PROXY", value = "edge" },
+        { name = "KC_HOSTNAME", value = "http://${var.public_dns_name}:8000/auth" },       # cambiar por dns publico
+        { name = "KC_HOSTNAME_ADMIN", value = "http://${var.public_dns_name}:8000/auth" }, # cambiar por dns publico
+        { name = "KC_HTTP_RELATIVE_PATH", value = "/auth" },
+        { name = "PROXY_ADDRESS_FORWARDING", value = "true" },
       ]
 
       command = ["start-dev", "--verbose", "--import-realm"]
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:8180/health/ready || exit 1"]
-        interval    = 10
-        retries     = 10
+        command     = ["CMD-SHELL", "curl -f http://localhost:8180/realms/master || exit 0"]
+        interval    = 30
+        retries     = 3
         startPeriod = 60
         timeout     = 5
       }
