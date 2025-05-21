@@ -76,6 +76,7 @@ resource "aws_ecs_task_definition" "frontend" {
       name      = "frontend"
       image     = "${var.ecr_frontend_image}:${var.ecr_frontend_image_tag}"
       essential = true
+      value     = timestamp()
       portMappings = [
         {
           containerPort = var.frontend_container_port
@@ -83,7 +84,7 @@ resource "aws_ecs_task_definition" "frontend" {
         }
       ]
       environment = [
-        { name = "VITE_KONG_ADDRESS", value = "http://${var.public_dns_name}:8000" },
+        { name = "VITE_KONG_ADDRESS", value = "https://votacionproxy.duckdns.org" },
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -332,11 +333,12 @@ resource "aws_ecs_task_definition" "kong_migrations" {
 #########################################
 
 resource "aws_ecs_service" "frontend" {
-  name            = "frontend"
-  cluster         = aws_ecs_cluster.micro.id
-  task_definition = aws_ecs_task_definition.frontend.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                 = "frontend"
+  cluster              = aws_ecs_cluster.micro.id
+  task_definition      = aws_ecs_task_definition.frontend.arn
+  desired_count        = 1
+  launch_type          = "FARGATE"
+  force_new_deployment = true
 
   network_configuration {
     subnets          = var.subnet_ids

@@ -118,7 +118,8 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
     --data "paths[]=/auth" \
     --data "paths[]=/auth/*" \
-    --data "strip_path=false"
+    --data "strip_path=false" \
+    --data "preserve_host=true"
 
 ### Backend Service Routes ###
 # curl -s -X POST ${KONG_ADMIN_URL}/routes \
@@ -186,7 +187,7 @@ curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "route.id=3c02b7c0-0e0b-466f-b9b3-332a1b458e03" \
   --data "config.client_id=web-client" \
   --data "config.client_secret=cf657905-6daa-4e65-806f-86dd7c968b78" \
-  --data "config.discovery=http://localhost:8000/auth/realms/votacion_ot/.well-known/openid-configuration" \
+  --data "config.discovery=http://votacionproxy.duckdns.org/auth/realms/votacion_ot/.well-known/openid-configuration" \
   --data "config.scope=openid" \
   --data "config.bearer_only=no" \
   --data "config.unauth_action=deny" \
@@ -195,7 +196,8 @@ curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "config.userinfo_header_name=X-Userinfo" \
   --data "config.id_token_header_name=X-Id-Token" \
   --data "config.bearer_jwt_auth_enable=yes" \
-  --data "config.use_jwks=yes"
+  --data "config.use_jwks=yes" \
+  --data "config.cookie_secure=true" \
 
 
 

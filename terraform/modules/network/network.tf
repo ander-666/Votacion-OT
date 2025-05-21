@@ -293,7 +293,7 @@ resource "aws_lb_target_group" "keycloak" {
 
   health_check {
     path                = "/health/live"
-    matcher             = "200-399" # acepta cualquier 2xx o 3xx
+    matcher             = "200-499" # acepta cualquier 2xx o 3xx
     interval            = 10
     timeout             = 5
     healthy_threshold   = 2

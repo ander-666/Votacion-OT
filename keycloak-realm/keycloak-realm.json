@@ -783,18 +783,17 @@
       "clientId": "web-client",
       "name": "WebClient",
       "description": "OIDC client for web based applications",
-      "rootUrl": "http://localhost:8002",
+      "rootUrl": "https://votacionot.duckdns.org",
       "adminUrl": "",
-      "baseUrl": "http://localhost:8002",
+      "baseUrl": "https://votacionot.duckdns.org",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "cf657905-6daa-4e65-806f-86dd7c968b78",
       "redirectUris": [
-        "http://localhost:8000/*",
-        "http://kong:8000/*",
-        "http://localhost:8002/*"
+        "https://votacionproxy.duckdns.org/*",
+        "https://votacionot.duckdns.org/*"
       ],
       "webOrigins": ["/*", "http://localhost:8002"],
       "notBefore": 0,
