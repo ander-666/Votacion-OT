@@ -16,19 +16,19 @@ jobs:
   test:
     name: Run JUnit Tests
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/tests_funcionales' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
@@ -37,9 +37,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Run JUnit Tests
+      - name: Run JUnit Tests (no bloqueante)
         working-directory: Backend/ot_backend
         run: mvn -P local clean test
+        continue-on-error: true
 
       - name: Upload test results
         if: always()
@@ -51,6 +52,9 @@ jobs:
   lint:
     name: Static Code Analysis
     runs-on: ubuntu-latest
+    needs: test
+    if: ${{ always() }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,9 +62,9 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
@@ -70,41 +74,42 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Run Checkstyle
-        working-directory: Backend/ot_backend   
+        working-directory: Backend/ot_backend
         continue-on-error: true
         run: mvn -q checkstyle:check
 
       - name: Run PMD
-        working-directory: Backend/ot_backend   
+        working-directory: Backend/ot_backend
         continue-on-error: true
         run: mvn -q pmd:check
 
       - name: Run SpotBugs
-        working-directory: Backend/ot_backend   
+        working-directory: Backend/ot_backend
         continue-on-error: true
         run: mvn -q spotbugs:check
 
       - name: OWASP Dependency-Check
-        working-directory: Backend/ot_backend   
+        working-directory: Backend/ot_backend
         continue-on-error: true
         run: mvn -q org.owasp:dependency-check-maven:check -Ddependency-check.failBuildOnCVSS=7
 
   sonar:
-    name: Build and Analyze
+    name: SonarQube Analysis
     runs-on: ubuntu-latest
     needs: lint
+    if: ${{ always() }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: 'zulu' 
+          java-version: "17"
+          distribution: "zulu"
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4

@@ -84,6 +84,15 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Allow TCP to Keycloak"
+    from_port   = 8180
+    to_port     = 8180
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
   # —————————————— Comunicación interna ——————————————
   ingress {
     description = "Allow all traffic between ECS tasks in this SG"
@@ -174,6 +183,14 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Keycloak interno"
+    from_port   = 8180
+    to_port     = 8180
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Salida libre hacia cualquier lado (el ALB hablará con los TGs)
   egress {
     from_port   = 0
@@ -241,7 +258,7 @@ resource "aws_lb_target_group" "kong" {
   target_type = "ip"
 
   health_check {
-    path                = "/Participants"
+    path                = "/free"
     matcher             = "200-399"
     interval            = 10
     timeout             = 5
@@ -275,8 +292,8 @@ resource "aws_lb_target_group" "keycloak" {
   target_type = "ip"
 
   health_check {
-    path                = "/health/ready"
-    matcher             = "200-399" # acepta cualquier 2xx o 3xx
+    path                = "/health/live"
+    matcher             = "200-499" # acepta cualquier 2xx o 3xx
     interval            = 10
     timeout             = 5
     healthy_threshold   = 2

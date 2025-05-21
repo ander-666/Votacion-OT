@@ -42,7 +42,7 @@ resource "aws_lb_target_group" "kong_proxy_tg" {
 
 
   health_check {
-    path                = "/Participants"
+    path                = "/free"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5

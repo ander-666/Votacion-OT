@@ -8,19 +8,7 @@ import Ranking from "./pages/Ranking";
 import Calendario from "./pages/Calendario";
 import Foro from "./pages/Foro";
 import Playlist from "./pages/Playlist";
-import { useSession } from "./hooks/useSession";
 import Inicio from "./pages/Inicio"; 
-
-function ProtectedRoute({ element }) {
-  const { isLoggedIn, login } = useSession();
-
-  if (!isLoggedIn) {
-    login();
-    return null;
-  }
-  
-  return element;
-}
 
 export default function App() {
   return (

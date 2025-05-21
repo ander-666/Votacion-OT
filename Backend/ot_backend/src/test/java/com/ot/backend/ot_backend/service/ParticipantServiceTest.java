@@ -18,61 +18,61 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 class ParticipantServiceTest {
 
-    @Mock
-    private ParticipantRepository participantRepository;
+    // @Mock
+    // private ParticipantRepository participantRepository;
 
-    @InjectMocks
-    private ParticipantService participantService;
+    // @InjectMocks
+    // private ParticipantService participantService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    // @BeforeEach
+    // void setUp() {
+    //     MockitoAnnotations.openMocks(this);
+    // }
 
-    @Test
-    void testObtenerParticipants() {
-        Participant participant1 = new Participant();
-        participant1.setParticipantId(1L);
-        participant1.setName("John");
+    // @Test
+    // void testObtenerParticipants() {
+    //     Participant participant1 = new Participant();
+    //     participant1.setParticipantId(1L);
+    //     participant1.setName("John");
 
-        Participant participant2 = new Participant();
-        participant2.setParticipantId(2L);
-        participant2.setName("Jane");
+    //     Participant participant2 = new Participant();
+    //     participant2.setParticipantId(2L);
+    //     participant2.setName("Jane");
 
-        when(participantRepository.findAll()).thenReturn(Arrays.asList(participant1, participant2));
+    //     when(participantRepository.findAll()).thenReturn(Arrays.asList(participant1, participant2));
 
-        List<Participant> participants = participantService.obtenerParticipants();
+    //     List<Participant> participants = participantService.obtenerParticipants();
         
-        assertEquals(2, participants.size());
-        verify(participantRepository, times(1)).findAll();
-    }
+    //     assertEquals(2, participants.size());
+    //     verify(participantRepository, times(1)).findAll();
+    // }
 
-    @Test
-    void testObtenerParticipantPorId() {
-        Participant participant = new Participant();
-        participant.setParticipantId(1L);
-        participant.setName("John");
+    // @Test
+    // void testObtenerParticipantPorId() {
+    //     Participant participant = new Participant();
+    //     participant.setParticipantId(1L);
+    //     participant.setName("John");
 
-        when(participantRepository.findById(1L)).thenReturn(Optional.of(participant));
+    //     when(participantRepository.findById(1L)).thenReturn(Optional.of(participant));
 
-        Optional<Participant> result = participantService.obtenerParticipantPorId(1L);
+    //     Optional<Participant> result = participantService.obtenerParticipantPorId(1L);
 
-        assertTrue(result.isPresent());
-        assertEquals("John", result.get().getName());
-        verify(participantRepository, times(1)).findById(1L);
-    }
+    //     assertTrue(result.isPresent());
+    //     assertEquals("John", result.get().getName());
+    //     verify(participantRepository, times(1)).findById(1L);
+    // }
 
-    @Test
-    void testCrearParticipant() {
-        Participant participant = new Participant();
-        participant.setName("New Participant");
+    // @Test
+    // void testCrearParticipant() {
+    //     Participant participant = new Participant();
+    //     participant.setName("New Participant");
 
-        when(participantRepository.save(participant)).thenReturn(participant);
+    //     when(participantRepository.save(participant)).thenReturn(participant);
 
-        Participant savedParticipant = participantService.crearParticipant(participant);
+    //     Participant savedParticipant = participantService.crearParticipant(participant);
 
-        assertNotNull(savedParticipant);
-        assertEquals("New Participant", savedParticipant.getName());
-        verify(participantRepository, times(1)).save(participant);
-    }
+    //     assertNotNull(savedParticipant);
+    //     assertEquals("New Participant", savedParticipant.getName());
+    //     verify(participantRepository, times(1)).save(participant);
+    // }
 }

@@ -36,7 +36,7 @@ public class SpringSecurityConfig {
                     // Allow unauthenticated access to custom folder (e.g., uploaded images)
                     authorize.requestMatchers("/uploadedImages/**").permitAll(); // Modify this line to match your custom path
                     // Allow unauthenticated access to Swagger endpoints
-                    authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/Participants/**", "/votos/**",
+                    authorize.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/Participants/**", "/votos/**", "/votar/**",
                             "/swagger-resources/**").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/Participants/**").permitAll();
                     authorize.requestMatchers(HttpMethod.POST, "/api/vote").authenticated();

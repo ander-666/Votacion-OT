@@ -76,6 +76,7 @@ resource "aws_ecs_task_definition" "frontend" {
       name      = "frontend"
       image     = "${var.ecr_frontend_image}:${var.ecr_frontend_image_tag}"
       essential = true
+      value     = timestamp()
       portMappings = [
         {
           containerPort = var.frontend_container_port
@@ -83,7 +84,7 @@ resource "aws_ecs_task_definition" "frontend" {
         }
       ]
       environment = [
-        { name = "VITE_KONG_ADDRESS", value = "http://${var.public_dns_name}:8000" },
+        { name = "VITE_KONG_ADDRESS", value = "https://votacionproxy.duckdns.org" },
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -246,8 +247,8 @@ resource "aws_ecs_task_definition" "keycloak" {
       ]
 
       environment = [
-        { name = "KEYCLOAK_ADMIN", value = "user" },
-        { name = "KEYCLOAK_ADMIN_PASSWORD", value = "password" },
+        { name = "KC_BOOTSTRAP_ADMIN_USERNAME", value = "user" },
+        { name = "KC_BOOTSTRAP_ADMIN_PASSWORD", value = "password" },
         { name = "KC_DB", value = "postgres" },
         { name = "KC_DB_URL_HOST", value = var.rds_instance_data },
         { name = "KC_DB_URL_PORT", value = "5432" },
@@ -260,14 +261,19 @@ resource "aws_ecs_task_definition" "keycloak" {
         { name = "KC_HEALTH_ENABLED", value = "true" },
         { name = "KEYCLOAK_IMPORT", value = "/opt/keycloak/data/import/keycloak-realm.json" },
         { name = "KONG_URL", value = var.dns_name },
+        { name = "KC_PROXY", value = "edge" },
+        { name = "KC_HOSTNAME", value = "http://${var.public_dns_name}:8000/auth" },       # cambiar por dns publico
+        { name = "KC_HOSTNAME_ADMIN", value = "http://${var.public_dns_name}:8000/auth" }, # cambiar por dns publico
+        { name = "KC_HTTP_RELATIVE_PATH", value = "/auth" },
+        { name = "PROXY_ADDRESS_FORWARDING", value = "true" },
       ]
 
       command = ["start-dev", "--verbose", "--import-realm"]
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:8180/health/ready || exit 1"]
-        interval    = 10
-        retries     = 10
+        command     = ["CMD-SHELL", "curl -f http://localhost:8180/realms/master || exit 0"]
+        interval    = 30
+        retries     = 3
         startPeriod = 60
         timeout     = 5
       }
@@ -327,11 +333,12 @@ resource "aws_ecs_task_definition" "kong_migrations" {
 #########################################
 
 resource "aws_ecs_service" "frontend" {
-  name            = "frontend"
-  cluster         = aws_ecs_cluster.micro.id
-  task_definition = aws_ecs_task_definition.frontend.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                 = "frontend"
+  cluster              = aws_ecs_cluster.micro.id
+  task_definition      = aws_ecs_task_definition.frontend.arn
+  desired_count        = 1
+  launch_type          = "FARGATE"
+  force_new_deployment = true
 
   network_configuration {
     subnets          = var.subnet_ids

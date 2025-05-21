@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/global.css";
-import { SessionProvider } from "./context/SessionProvider";
+import { SessionProvider } from "./context/sessionProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

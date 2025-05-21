@@ -1,8 +1,8 @@
-/* eslint-disable no-undef */
-/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import { useSession } from "../hooks/useSession";
-import { fetchData } from "../fetchData";
+import configData from "../config.json";
+
+import keycloak from "../hooks/keycloak";
 import { useState } from "react";
 
 const ModalOverlay = styled.div`
@@ -57,64 +57,94 @@ const Button = styled.button`
   }
 `;
 
-export default function ParticipantModal({ participant, onClose, setShowLoginPopup }) {
-  const { isLoggedIn } = useSession()  
-  const [voteDone, setVoteDone] = useState(false)
-  const [voteText, setVoteText] = useState("")
+export default function ParticipantModal({ participant, onClose }) {
+  const { isLoggedIn } = useSession();
+  const [voteDone, setVoteDone] = useState(false);
+  const [voteText, setVoteText] = useState("");
+  const [hasVoted, setHasVoted] = useState(false);
 
-  const handleVote = () => {
-    if(isLoggedIn){
-      // setVoteDone(true)
-      // setVoteError(false)
-      try{
-        const voteData = fetchData(`${window.env?.VITE_KONG_ADDRESS}/Votos`, "POST",
-          { headers:
-              {
-                "Content-Type": "application/json"
-              },
-            body:
-              {
-                "galaId": configData.GALA_ID,
-                "participantId": participant.participantId
-              }
-        });
-        let voteResult = voteData.read()
-        setVoteText(voteResult)
-      }
-      catch{
-        setVoteText("Error al votar");
-      }
-      finally{
-        setVoteDone(true);
-      }
+  const handleVote = async () => {
+    console.log("Votación iniciada");
+
+    if (!keycloak.token) {
+      console.log("Votacion: no estas logeado");
+      onClose();
+      keycloak.login();
+      return;
     }
-    else{
-      onClose(); // ✅ Cierra el modal del participante antes de abrir el LoginPopup
-      setTimeout(() => {
-        setShowLoginPopup(!isLoggedIn);
-      }, 200);
-    }  
+
+    try {
+      // Asegurar que el token esté actualizado
+      await keycloak.updateToken(30);
+
+      console.log("Votacion: llamando a API");
+
+      console.log("Token actual", keycloak.token);
+
+      const response = await fetch(`${window.env?.VITE_KONG_ADDRESS}/protected/votar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${keycloak.token}`,
+          "X-Id-Token": keycloak.idToken
+        },
+        body: JSON.stringify({
+          galaId: configData.GALA_ID,
+          participantId: participant.participantId
+        })
+      });
+
+      console.log("Response status:", response.status);
+      console.log("Response headers:", [...response.headers.entries()]);
+
+      const resultText = await response.text();
+      console.log("Response body:", resultText);
+      if (!response.ok) {
+        if (resultText.includes("Ya has votado")) {
+          setHasVoted(true);
+          setVoteText("Ya has votado en esta gala.");
+        } else {
+          setVoteText("Error al votar.");
+        }
+      } else {
+        setVoteText(resultText);
+        setHasVoted(true);
+      }
+
+      console.log("Voto registrado");
+
+    } catch (error) {
+      console.error("Error al votar:", error);
+      setVoteText("Error al votar.");
+    } finally {
+      setVoteDone(true);
+    }
   };
-  
+
   return (
     <ModalOverlay>
       <ModalContent>
-          {voteDone ? 
-            <>
-              <p>{voteText}</p>
-              <Button onClick={onClose}>Cerrar</Button>
-            </>
-            :
-            <>
-            <h2>{participant.name}</h2>
-            <ImageContainer>
-              <img src={`data:image/jpeg;base64,${participant.image}`} alt={participant.name} width="100%" height="100%" />
-            </ImageContainer>
-            <p>{participant.description}</p>
-            <Button onClick={handleVote}>Votar</Button>
+        {voteDone ? (
+          <>
+            <p>{voteText}</p>
             <Button onClick={onClose}>Cerrar</Button>
           </>
-        }
+        ) : (
+          <>
+            <h2>{participant.name}</h2>
+            <ImageContainer>
+              <img
+                src={`data:image/jpeg;base64,${participant.image}`}
+                alt={participant.name}
+                width="100%"
+                height="100%"
+              />
+            </ImageContainer>
+            <p>{participant.description}</p>
+            <Button onClick={handleVote} disabled={hasVoted}>Votar</Button>
+            <Button onClick={onClose}>Cerrar</Button>
+          </>
+        )}
       </ModalContent>
     </ModalOverlay>
   );

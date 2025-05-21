@@ -50,6 +50,19 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "url=${BACKEND_URL}" \
    --data "protocol=http"
 
+# Create a free Kong service for the backend API
+curl -i -X POST ${KONG_ADMIN_URL}/services \
+   --data "id=94157cc3-0e51-4950-8fdb-156f95987c10" \
+   --data "name=backend-free-service" \
+   --data "url=${BACKEND_URL}/Participants" \
+   --data "protocol=http"
+
+curl -i -X POST ${KONG_ADMIN_URL}/services \
+   --data "id=94157cc3-0e51-4950-8fdb-156f95987c11" \
+   --data "name=backend-alsofree-service" \
+   --data "url=${BACKEND_URL}/votos" \
+   --data "protocol=http"
+
 # Create a Kong service for Keycloak
 curl -i -X POST ${KONG_ADMIN_URL}/services \
    --data "id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
@@ -63,13 +76,22 @@ curl -i -X POST ${KONG_ADMIN_URL}/services \
 ##########################
 
 ### Backend Free Service Routes ###
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
+ FREE_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
+    --data "service.name=backend-free-service" \
     --data "id=3c02b7c0-0e0b-258f-b9b3-332a1b458e02" \
-    --data "service.id=94157cc3-0e51-4950-8fdb-156f95987c09" \
+    --data "service.id=94157cc3-0e51-4950-8fdb-156f95987c10" \
     --data "paths[]=/free" \
     --data "paths[]=/free/*" \
-    --data "strip_path=true"
+    --data "strip_path=true")
+
+### Backend Free Service Routes ###
+ ALSOFREE_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
+    --data "service.name=backend-alsofree-service" \
+    --data "id=3c02b7c0-0e0b-258f-b9b3-332a1b458e04" \
+    --data "service.id=94157cc3-0e51-4950-8fdb-156f95987c11" \
+    --data "paths[]=/alsofree" \
+    --data "paths[]=/alsofree/*" \
+    --data "strip_path=true")
 
 #Create an API Key route for backend-service
  APIKEY_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
@@ -80,6 +102,15 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
    --data "paths[]=/api-key/*" \
    --data "strip_path=true")
 
+   #Create an API Key route for backend-service
+ PROTECTED_ROUTE_RESPONSE=$(curl -s -X POST ${KONG_ADMIN_URL}/routes \
+   --data "service.name=backend-service" \
+   --data "id=3c02b7c0-0e0b-466f-b9b3-332a1b458e03" \
+   --data "service.id=94157cc3-0e51-4950-8fdb-384f95987c09" \
+   --data "paths[]=/protected" \
+   --data "paths[]=/protected/*" \
+   --data "strip_path=true")
+
 # Create a Keycloak route
 curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.name=keycloak" \
@@ -87,23 +118,24 @@ curl -s -X POST ${KONG_ADMIN_URL}/routes \
     --data "service.id=c0505e29-360b-40b3-8f90-b36611cd38f3" \
     --data "paths[]=/auth" \
     --data "paths[]=/auth/*" \
-    --data "strip_path=false"
+    --data "strip_path=false" \
+    --data "preserve_host=true"
 
 ### Backend Service Routes ###
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "paths[]=/" \
-    --data "strip_path=false"
+# curl -s -X POST ${KONG_ADMIN_URL}/routes \
+#     --data "service.name=backend-service" \
+#     --data "paths[]=/" \
+#     --data "strip_path=false"
 
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "paths[]=/Participants" \
-    --data "strip_path=false"
+# curl -s -X POST ${KONG_ADMIN_URL}/routes \
+#     --data "service.name=backend-service" \
+#     --data "paths[]=/Participants" \
+#     --data "strip_path=false"
 
-curl -s -X POST ${KONG_ADMIN_URL}/routes \
-    --data "service.name=backend-service" \
-    --data "paths[]=/Votos" \
-    --data "strip_path=false"
+# curl -s -X POST ${KONG_ADMIN_URL}/routes \
+#     --data "service.name=backend-service" \
+#     --data "paths[]=/Votos" \
+#     --data "strip_path=false"
 
  APIKEY_ROUTE_ID=$(echo "$APIKEY_ROUTE_RESPONSE" | jq -r '.id')
  if [ -z "$APIKEY_ROUTE_ID" ]; then
@@ -151,14 +183,24 @@ echo "Configuring plugins..."
 
 # Enable the OIDC plugin on the OIDC route
 curl -s -X POST ${KONG_ADMIN_URL}/plugins \
-  --data "id=3d1b5e45-8b4b-4052-9f2e-297806d5902a" \
-  --data "route.id=3c02b7c0-0e0b-466f-b9b3-332a1b458e02" \
   --data "name=oidc" \
+  --data "route.id=3c02b7c0-0e0b-466f-b9b3-332a1b458e03" \
   --data "config.client_id=web-client" \
   --data "config.client_secret=cf657905-6daa-4e65-806f-86dd7c968b78" \
-  --data "config.bearer_jwt_auth_enable=yes" \
+  --data "config.discovery=http://votacionproxy.duckdns.org/auth/realms/votacion_ot/.well-known/openid-configuration" \
+  --data "config.scope=openid" \
+  --data "config.bearer_only=no" \
+  --data "config.unauth_action=deny" \
   --data "config.access_token_as_bearer=yes" \
-  --data "config.discovery=http://localhost:8000/auth/realms/votacion_ot/.well-known/openid-configuration"
+  --data "config.disable_access_token_header=yes" \
+  --data "config.userinfo_header_name=X-Userinfo" \
+  --data "config.id_token_header_name=X-Id-Token" \
+  --data "config.bearer_jwt_auth_enable=yes" \
+  --data "config.use_jwks=yes" \
+  --data "config.cookie_secure=true" \
+
+
+
 
 # Enable the JWT plugin on the JWT route
 # curl -i -X POST ${KONG_ADMIN_URL}/routes/${JWT_ROUTE_ID}/plugins \
@@ -179,11 +221,21 @@ curl -i -X POST ${KONG_ADMIN_URL}/routes/${APIKEY_ROUTE_ID}/plugins \
 # Plugin CORS en el servicio backend-service (frontend → Kong)
 curl -s -X POST ${KONG_ADMIN_URL}/plugins \
   --data "name=cors" \
-  --data "config.origins=*" \
-  --data "config.headers=Accept,Authorization,Content-Type" \
-  --data "config.exposed_headers=Content-Length" \
-  --data "config.credentials=false" \
-  --data "config.max_age=3600"
+  --data "config.origins=*" \
+  --data "config.methods[]=GET" \
+  --data "config.methods[]=HEAD" \
+  --data "config.methods[]=PUT" \
+  --data "config.methods[]=PATCH" \
+  --data "config.methods[]=POST" \
+  --data "config.methods[]=DELETE" \
+  --data "config.methods[]=OPTIONS" \
+  --data "config.methods[]=TRACE" \
+  --data "config.methods[]=CONNECT" \
+  --data "config.headers=Accept,Authorization,Content-Type, X-Id-Token" \
+  --data "config.exposed_headers=Content-Length" \
+  --data "config.credentials=true" \
+  --data "config.max_age=3600"
+
 
 
 ##########################

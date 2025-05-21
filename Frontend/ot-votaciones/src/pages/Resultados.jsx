@@ -49,7 +49,7 @@ const ChartWrapper = styled.div`
   justify-content: center;
 `;
 
-const VotesData = fetchData(`${window.env?.VITE_KONG_ADDRESS}/votos`);
+const VotesData = fetchData(`${window.env?.VITE_KONG_ADDRESS}/alsofree`);
 
 export default function Resultados() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

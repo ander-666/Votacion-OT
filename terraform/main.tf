@@ -9,13 +9,13 @@ terraform {
       version = "~> 5.0"
     }
   }
-  #
-  # Opcional: backend remoto para el estado
-  # backend "s3" {
-  #   bucket = "mi-bucket-terraform-state"
-  #   key    = "microservices/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket               = "mi-bucket-terraform-state"
+    key                  = "microservices/terraform.tfstate"
+    region               = "us-east-1"
+    encrypt              = true
+    workspace_key_prefix = ""
+  }
 }
 
 provider "aws" {

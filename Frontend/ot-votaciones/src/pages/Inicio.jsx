@@ -7,6 +7,9 @@ import ParticipantCarousel from "../components/ParticipantCarousel";
 import styled from "styled-components";
 import { ParticipantProvider } from "../context/ParticipantProvider";
 
+//background: linear-gradient(180deg, #ff416c, #ff4b2b);
+
+
 const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;

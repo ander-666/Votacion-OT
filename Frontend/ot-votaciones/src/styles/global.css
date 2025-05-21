@@ -51,14 +51,14 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Mejor que center si tienes títulos y listas */
   text-align: center;
-  height: 100vh;
+  min-height: 100vh; /* <-- permite crecer si hay más contenido */
   width: 100vw;
   background: linear-gradient(180deg, #4b6cb7, #182848);
   color: white;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;  /* <-- permite hacer scroll si hay mucho contenido */
   padding: 20px;
 }
 
@@ -70,4 +70,10 @@ button {
   height: 100vh;
   background: linear-gradient(180deg, #6a11cb, #2575fc);
   color: white;
+}
+
+.rankingList {
+  max-width: 1000px;
+  width: 100%;
+  padding: 20px;
 }
