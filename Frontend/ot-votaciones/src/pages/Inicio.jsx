@@ -7,7 +7,8 @@ import ParticipantCarousel from "../components/ParticipantCarousel";
 import styled from "styled-components";
 import { ParticipantProvider } from "../context/ParticipantProvider";
 
-//background: linear-gradient(180deg, #4b6cb7, #182848);
+//background: linear-gradient(180deg, #ff416c, #ff4b2b);
+
 
 const HomeContainer = styled.div`
   display: flex;
@@ -17,7 +18,7 @@ const HomeContainer = styled.div`
   text-align: center;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(180deg, #ff416c, #ff4b2b);
+  background: linear-gradient(180deg, #4b6cb7, #182848);
   color: white;
   position: relative;
   overflow: hidden;

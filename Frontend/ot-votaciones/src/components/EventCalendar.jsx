@@ -13,8 +13,8 @@ const CalendarContainer = styled.div`
 
 const events = [
   { date: "2025-03-01", name: "Gala 1 - Presentación" },
-  { date: "2025-03-08", name: "Gala 2 - Eliminación" },
   { date: "2025-03-15", name: "Gala 3 - Segunda Ronda" },
+  { date: "2025-03-08", name: "Gala 2 - Eliminación" },
 ];
 
 export default function EventCalendar() {
